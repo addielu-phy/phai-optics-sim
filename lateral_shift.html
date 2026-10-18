@@ -1,0 +1,108 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>平行玻璃磚側位移｜幾何光學互動模擬</title><style>*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI","Helvetica Neue",Arial,"Noto Sans TC","Noto Sans CJK TC","PingFang TC","Microsoft JhengHei","Noto Sans","DejaVu Sans",sans-serif;background:#0d1224;color:#e8ecff}
+header{padding:10px 20px;display:flex;align-items:baseline;gap:16px;border-bottom:1px solid #253055}
+header h1{font-size:22px;margin:0;white-space:nowrap}header p{margin:0;color:#9fb0e0;font-size:14px}
+header a{margin-left:auto;color:#8fb3ff;text-decoration:none;font-size:14px;white-space:nowrap}
+.wrap{display:grid;grid-template-columns:1fr 350px;gap:14px;padding:12px 16px}
+.stage{display:flex;flex-direction:column;gap:10px}
+#cv{width:100%;height:650px;background:#060a18;border-radius:12px;display:block}
+.panel{background:#131a33;border:1px solid #26305a;border-radius:12px;padding:10px 14px;font-size:14px;max-height:650px;overflow:auto}
+.ctl{margin:6px 0}.ctl label{display:flex;justify-content:space-between}.ctl b{color:#ffd84d;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:#7aa2ff;margin:2px 0}
+.read{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dashed #2a3560}.read b{color:#7ff0c8;font-variant-numeric:tabular-nums}
+h3{font-size:15px;margin:10px 0 4px;color:#a9c1ff}
+.note{color:#9fb0e0;font-size:13px;line-height:1.55;margin:6px 0}
+.formula{background:#0b1022;border-radius:8px;padding:5px 10px;margin:5px 0;font-family:"Cambria Math","Times New Roman",serif;font-size:16px;text-align:center}
+.mini{width:100%;height:180px;background:#060a18;border-radius:8px;display:block;margin-top:6px}
+.btns{display:flex;flex-wrap:wrap;gap:3px;align-items:center}
+.btns button{background:#1d2850;color:#e8ecff;border:1px solid #34437a;border-radius:6px;padding:2px 7px;cursor:pointer;font-size:12px}
+.btns button:hover{background:#2a3a70}
+.chk{display:flex;gap:6px;align-items:center;margin:6px 0}
+select{background:#1d2850;color:#e8ecff;border:1px solid #34437a;border-radius:6px;padding:3px}
+table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}td,th{padding:2px 4px;text-align:right;border-bottom:1px solid #222c50}th{color:#a9c1ff;font-weight:normal}
+.bar{height:10px;background:#0b1022;border-radius:5px;overflow:hidden;margin:2px 0 6px}.bar span{display:block;height:100%;background:#ffd84d}
+.tir{color:#ff7b7b;font-weight:bold}.ok{color:#7ff0c8;font-weight:bold}
+@media(max-width:900px){.wrap{grid-template-columns:1fr}#cv{height:480px}.panel{max-height:none}}
+</style></head><body>
+<header><h1>平行玻璃磚的側位移</h1><p>光穿過平行玻璃磚後，出射光與入射光平行，但向旁邊平移了一段距離 d。</p><a href="index.html">← 返回目錄</a></header>
+<div class="wrap"><div class="stage"><canvas id="cv"></canvas></div>
+<div class="panel">
+<h3>參數</h3>
+<div class="ctl"><label for="t">玻璃磚厚度 t<b id="v_t"></b></label><input type="range" id="t" min="1" max="8" step="0.1" value="5" data-u=" cm"></div>
+<div class="ctl"><label for="th">入射角 θ₁<b id="v_th"></b></label><input type="range" id="th" min="0" max="85" step="0.5" value="50" data-u="°"></div>
+<div class="ctl"><label for="n">玻璃折射率 n（外側為空氣 n = 1）<b id="v_n"></b></label><input type="range" id="n" min="1.00" max="2.50" step="0.01" value="1.50" data-u=""></div>
+<div class="formula">d = t · sin(θ₁ − θ₂) / cos θ₂</div>
+<h3>即時數據</h3>
+<div class="read"><span>折射角 θ₂（sin θ₂ = sin θ₁ / n）</span><b id="r_t2">—</b></div>
+<div class="read"><span>玻璃中路徑長 t / cos θ₂</span><b id="r_path">—</b></div>
+<div class="read"><span>側位移 d（公式）</span><b id="r_d">—</b></div>
+<div class="read"><span>側位移 d（由作圖座標量測）</span><b id="r_dm">—</b></div>
+<div class="read"><span>出射角（應等於 θ₁）</span><b id="r_ex">—</b></div>
+<canvas id="mini" class="mini"></canvas>
+<p class="note">上圖：d 隨入射角 θ₁ 的變化（目前 t 與 n）。θ₁ = 0 時 d = 0；θ₁ → 90° 時 d → t。</p>
+</div></div>
+<script>const $=id=>document.getElementById(id),D2R=Math.PI/180,R2D=180/Math.PI;
+const val=id=>parseFloat($(id).value);
+const out=(id,t)=>{const e=$(id);if(e)e.innerHTML=t;};
+const f=(x,d=2)=>Number.isFinite(x)?x.toFixed(d):'—';
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1];
+const FONT='"Segoe UI","Helvetica Neue",Arial,"Noto Sans TC","Noto Sans CJK TC","PingFang TC","Microsoft JhengHei","Noto Sans","DejaVu Sans",sans-serif';
+window.onerror=m=>{document.body.setAttribute('data-err',String(m));};
+function setup(cv){const r=window.devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;if(cv.width!==Math.round(w*r)||cv.height!==Math.round(h*r)){cv.width=Math.round(w*r);cv.height=Math.round(h*r);}const c=cv.getContext('2d');c.setTransform(r,0,0,r,0,0);c.clearRect(0,0,w,h);return{c,w,h};}
+function line(c,x1,y1,x2,y2,col,lw=2,dash){c.save();c.strokeStyle=col;c.lineWidth=lw;if(dash)c.setLineDash(dash);c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();c.restore();}
+function ray(c,x1,y1,x2,y2,col,lw=3,alpha=1,at=0.5){c.save();c.globalAlpha=Math.max(0,Math.min(1,alpha));line(c,x1,y1,x2,y2,col,lw);const mx=x1+(x2-x1)*at,my=y1+(y2-y1)*at,a=Math.atan2(y2-y1,x2-x1),s=6+lw*1.5;c.fillStyle=col;c.beginPath();c.moveTo(mx+s*Math.cos(a),my+s*Math.sin(a));c.lineTo(mx+s*Math.cos(a+2.6),my+s*Math.sin(a+2.6));c.lineTo(mx+s*Math.cos(a-2.6),my+s*Math.sin(a-2.6));c.closePath();c.fill();c.restore();}
+function arcA(c,x,y,r,a1,a2,col,lw=1.6){let d=a2-a1;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;c.save();c.strokeStyle=col;c.lineWidth=lw;c.beginPath();c.arc(x,y,r,a1,a1+d,d<0);c.stroke();c.restore();}
+function text(c,s,x,y,col='#e8ecff',size=15,align='left',bold){c.save();c.fillStyle=col;c.font=`${bold?'bold ':''}${size}px ${FONT}`;c.textAlign=align;c.fillText(s,x,y);c.restore();}
+function refractV(d,nr,n1,n2){const ci=-dot(nr,d),e=n1/n2,k=1-e*e*(1-ci*ci);if(k<0)return null;const s=e*ci-Math.sqrt(k);return[e*d[0]+s*nr[0],e*d[1]+s*nr[1]];}
+function reflectV(d,nr){const k=2*dot(d,nr);return[d[0]-k*nr[0],d[1]-k*nr[1]];}
+function rot(v,a){const c=Math.cos(a),s=Math.sin(a);return[v[0]*c-v[1]*s,v[0]*s+v[1]*c];}
+function fresnelR(n1,n2,ti){const st=n1/n2*Math.sin(ti);if(st>=1)return 1;const tt=Math.asin(st),ci=Math.cos(ti),ct=Math.cos(tt);const rs=((n1*ci-n2*ct)/(n1*ci+n2*ct))**2,rp=((n1*ct-n2*ci)/(n1*ct+n2*ci))**2;return(rs+rp)/2;}
+function medium(n){return `rgba(90,160,255,${Math.min(0.04+(n-1)*0.28,0.55).toFixed(3)})`;}
+function plot(cv,o){const {c,w,h}=setup(cv);const L=46,Rr=12,T=14,B=30;const X=x=>L+(x-o.x0)/(o.x1-o.x0)*(w-L-Rr),Y=y=>h-B-(y-o.y0)/(o.y1-o.y0)*(h-T-B);
+ c.strokeStyle='#26305a';c.lineWidth=1;
+ (o.xt||[]).forEach(t=>{line(c,X(t),T,X(t),h-B,'#1f2a50',1);text(c,String(t),X(t),h-B+15,'#8a96c0',11,'center');});
+ (o.yt||[]).forEach(t=>{line(c,L,Y(t),w-Rr,Y(t),'#1f2a50',1);text(c,String(t),L-5,Y(t)+4,'#8a96c0',11,'right');});
+ line(c,L,T,L,h-B,'#5a6799',1.2);line(c,L,h-B,w-Rr,h-B,'#5a6799',1.2);
+ c.save();c.beginPath();c.rect(L,T,w-L-Rr,h-T-B);c.clip();
+ (o.hl||[]).forEach(s=>line(c,L,Y(s.y),w-Rr,Y(s.y),s.col,1.2,[5,4]));
+ (o.series||[]).forEach(s=>{c.strokeStyle=s.col;c.lineWidth=s.lw||2;if(s.dash)c.setLineDash(s.dash);else c.setLineDash([]);c.beginPath();let pen=false;s.pts.forEach(p=>{if(!p||!Number.isFinite(p[1])){pen=false;return;}const px=X(p[0]),py=Y(p[1]);pen?c.lineTo(px,py):c.moveTo(px,py);pen=true;});c.stroke();});
+ c.restore();
+ (o.marks||[]).forEach(m=>{if(!Number.isFinite(m.y))return;c.fillStyle=m.col;c.beginPath();c.arc(X(m.x),Y(m.y),5,0,7);c.fill();if(m.label)text(c,m.label,X(m.x)+(m.dx||8),Y(m.y)+(m.dy||-8),m.col,12,m.align||'left');});
+ text(c,o.xl||'',w-Rr,h-4,'#9fb0e0',12,'right');text(c,o.yl||'',L+4,T+10,'#9fb0e0',12);
+ (o.legend||[]).forEach((g,i)=>{line(c,w-150,T+10+i*16,w-128,T+10+i*16,g.col,2.5,g.dash);text(c,g.t,w-122,T+14+i*16,'#cfd8ff',12);});
+ return{c,X,Y};}
+function syncLabels(){document.querySelectorAll('input[type=range]').forEach(e=>{const b=$('v_'+e.id);if(b){const d=+(e.dataset.d??(e.step.includes('.')?e.step.split('.')[1].length:0));b.textContent=parseFloat(e.value).toFixed(d)+(e.dataset.u||'');}});}
+function bindAll(fn){new URLSearchParams(location.search).forEach((v,k)=>{const e=$(k);if(!e)return;if(e.type==='checkbox')e.checked=v==='1';else e.value=v;});const g=()=>{syncLabels();fn();};document.querySelectorAll('input,select').forEach(e=>{e.addEventListener('input',g);e.addEventListener('change',g);});window.addEventListener('resize',g);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(g);g();}
+function sl(id,label,min,max,step,v,u=''){return '';}
+
+const cv=$('cv');
+function draw(){
+ const {c,w,h}=setup(cv);const t=val('t'),th=val('th')*D2R,n=val('n');
+ const sc=Math.min(56,(h-240)/t),y1=Math.round((h-t*sc)/2)-10,y2=y1+t*sc,xe=w*0.3;
+ c.fillStyle=medium(Math.max(n,1.25));c.fillRect(0,y1,w,y2-y1);line(c,0,y1,w,y1,'#9fc0ff',1.5);line(c,0,y2,w,y2,'#9fc0ff',1.5);
+ text(c,'空氣 n = 1.00',16,28,'#cfe0ff',15);text(c,`玻璃 n = ${f(n)}`,16,y1+24,'#cfe0ff',15);text(c,'空氣 n = 1.00',16,h-16,'#cfe0ff',15);
+ // thickness marker
+ line(c,w-40,y1,w-40,y2,'#cfe0ff',1.2);line(c,w-48,y1,w-32,y1,'#cfe0ff',1.2);line(c,w-48,y2,w-32,y2,'#cfe0ff',1.2);text(c,`t = ${f(t,1)} cm`,w-50,(y1+y2)/2+5,'#cfe0ff',14,'right',1);
+ const t2=Math.asin(Math.sin(th)/n),u=[Math.sin(th),Math.cos(th)],Lin=Math.min(180,y1-20)/Math.max(Math.cos(th),0.2);
+ const X2=[xe+t*sc*Math.tan(t2),y2];
+ line(c,xe,y1-110,xe,y1+80,'#8890b0',1,[5,5]);line(c,X2[0],y2-80,X2[0],y2+110,'#8890b0',1,[5,5]);
+ ray(c,xe-Lin*u[0],y1-Lin*u[1],xe,y1,'#ffd84d',3.5);
+ ray(c,xe,y1,X2[0],X2[1],'#ffd84d',3);
+ const Lout=Math.min(260,(h-y2-10))/Math.max(Math.cos(th),0.25);ray(c,X2[0],X2[1],X2[0]+Lout*u[0],y2+Lout*u[1],'#ffd84d',3.5,1,0.35);
+ // extension of incident
+ const Lx=(y2-y1)/Math.max(Math.cos(th),0.05)+Lout;line(c,xe,y1,xe+Lx*u[0],y1+Lx*u[1],'rgba(255,255,255,.5)',1.3,[4,5]);text(c,'入射光延長線',xe+Lx*0.62*u[0]+12,y1+Lx*0.62*u[1],'rgba(255,255,255,.6)',13);
+ // perpendicular d
+ const Q=[X2[0]+u[0]*Lout*0.55,X2[1]+u[1]*Lout*0.55],k=(Q[0]-xe)*u[0]+(Q[1]-y1)*u[1],F=[xe+u[0]*k,y1+u[1]*k];
+ const dpx=Math.hypot(Q[0]-F[0],Q[1]-F[1]);
+ if(dpx>2){line(c,Q[0],Q[1],F[0],F[1],'#ff7bd5',2.5);text(c,`d = ${f(dpx/sc,2)} cm`,(Q[0]+F[0])/2+10,(Q[1]+F[1])/2-6,'#ff7bd5',17,'left',1);}
+ arcA(c,xe,y1,48,-Math.PI/2,-Math.PI/2-th,'#ffd84d',2);text(c,`θ₁=${f(th*R2D,1)}°`,xe-10,y1-56,'#ffd84d',14,'right',1);
+ arcA(c,xe,y1,54,Math.PI/2,Math.PI/2-t2,'#7ff0c8',2);text(c,`θ₂=${f(t2*R2D,1)}°`,xe-10,y1+68,'#7ff0c8',14,'right',1);
+ arcA(c,X2[0],X2[1],48,Math.PI/2,Math.PI/2-th,'#ffd84d',2);text(c,`${f(th*R2D,1)}°`,X2[0]-8,X2[1]+62,'#ffd84d',13,'right');
+ const d=t*Math.sin(th-t2)/Math.cos(t2);
+ out('r_t2',f(t2*R2D,2)+'°');out('r_path',f(t/Math.cos(t2),3)+' cm');out('r_d',f(d,3)+' cm');out('r_dm',f(dpx/sc,3)+' cm');out('r_ex',f(th*R2D,2)+'°');
+ const pts=[];for(let a=0;a<=89.5;a+=0.5){const b=Math.asin(Math.sin(a*D2R)/n);pts.push([a,t*Math.sin(a*D2R-b)/Math.cos(b)]);}
+ const ym=Math.max(t,0.5);plot($('mini'),{x0:0,x1:90,y0:0,y1:ym*1.05,xt:[0,30,60,90],yt:[0,+(ym/2).toFixed(1),+ym.toFixed(1)],xl:'θ₁ (°)',yl:'d (cm)',hl:[{y:t,col:'rgba(255,255,255,.3)'}],series:[{pts,col:'#ff7bd5'}],marks:[{x:th*R2D,y:d,col:'#ffd84d'}]});
+}
+bindAll(draw);
+</script></body></html>

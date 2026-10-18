@@ -1,0 +1,130 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>稜鏡偏向角｜幾何光學互動模擬</title><style>*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI","Helvetica Neue",Arial,"Noto Sans TC","Noto Sans CJK TC","PingFang TC","Microsoft JhengHei","Noto Sans","DejaVu Sans",sans-serif;background:#0d1224;color:#e8ecff}
+header{padding:10px 20px;display:flex;align-items:baseline;gap:16px;border-bottom:1px solid #253055}
+header h1{font-size:22px;margin:0;white-space:nowrap}header p{margin:0;color:#9fb0e0;font-size:14px}
+header a{margin-left:auto;color:#8fb3ff;text-decoration:none;font-size:14px;white-space:nowrap}
+.wrap{display:grid;grid-template-columns:1fr 350px;gap:14px;padding:12px 16px}
+.stage{display:flex;flex-direction:column;gap:10px}
+#cv{width:100%;height:650px;background:#060a18;border-radius:12px;display:block}
+.panel{background:#131a33;border:1px solid #26305a;border-radius:12px;padding:10px 14px;font-size:14px;max-height:650px;overflow:auto}
+.ctl{margin:6px 0}.ctl label{display:flex;justify-content:space-between}.ctl b{color:#ffd84d;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:#7aa2ff;margin:2px 0}
+.read{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dashed #2a3560}.read b{color:#7ff0c8;font-variant-numeric:tabular-nums}
+h3{font-size:15px;margin:10px 0 4px;color:#a9c1ff}
+.note{color:#9fb0e0;font-size:13px;line-height:1.55;margin:6px 0}
+.formula{background:#0b1022;border-radius:8px;padding:5px 10px;margin:5px 0;font-family:"Cambria Math","Times New Roman",serif;font-size:16px;text-align:center}
+.mini{width:100%;height:180px;background:#060a18;border-radius:8px;display:block;margin-top:6px}
+.btns{display:flex;flex-wrap:wrap;gap:3px;align-items:center}
+.btns button{background:#1d2850;color:#e8ecff;border:1px solid #34437a;border-radius:6px;padding:2px 7px;cursor:pointer;font-size:12px}
+.btns button:hover{background:#2a3a70}
+.chk{display:flex;gap:6px;align-items:center;margin:6px 0}
+select{background:#1d2850;color:#e8ecff;border:1px solid #34437a;border-radius:6px;padding:3px}
+table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}td,th{padding:2px 4px;text-align:right;border-bottom:1px solid #222c50}th{color:#a9c1ff;font-weight:normal}
+.bar{height:10px;background:#0b1022;border-radius:5px;overflow:hidden;margin:2px 0 6px}.bar span{display:block;height:100%;background:#ffd84d}
+.tir{color:#ff7b7b;font-weight:bold}.ok{color:#7ff0c8;font-weight:bold}
+@media(max-width:900px){.wrap{grid-template-columns:1fr}#cv{height:480px}.panel{max-height:none}}
+</style></head><body>
+<header><h1>稜鏡偏向角與最小偏向角</h1><p>單色光通過稜鏡，偏向角 δ 隨入射角 i 先減後增；光路對稱時 δ 最小。</p><a href="index.html">← 返回目錄</a></header>
+<div class="wrap"><div class="stage"><canvas id="cv" style="height:360px"></canvas><canvas id="pl" class="mini" style="height:280px;margin:0;border-radius:12px"></canvas></div>
+<div class="panel">
+<h3>參數</h3>
+<div class="ctl"><label for="n">稜鏡折射率 n<b id="v_n"></b></label><input type="range" id="n" min="1.20" max="2.00" step="0.01" value="1.50" data-u=""></div>
+<div class="ctl"><label for="A">頂角 A<b id="v_A"></b></label><input type="range" id="A" min="20" max="80" step="1" value="60" data-u="°"></div>
+<div class="ctl"><label for="i1">入射角 i<b id="v_i1"></b></label><input type="range" id="i1" min="0" max="90" step="0.5" value="35" data-u="°"></div>
+<div class="btns"><button id="gomin">跳到最小偏向角</button></div>
+<div class="formula">δ = i + e − A　　r₁ + r₂ = A</div>
+<div class="formula">n = sin((A+δ<sub>min</sub>)/2) / sin(A/2)</div>
+<h3>目前光路</h3>
+<div class="read"><span>第一面折射角 r₁</span><b id="r_r1">—</b></div>
+<div class="read"><span>第二面入射角 r₂ = A − r₁</span><b id="r_r2">—</b></div>
+<div class="read"><span>出射角 e</span><b id="r_e">—</b></div>
+<div class="read"><span>偏向角 δ</span><b id="r_d">—</b></div>
+<h3>最小偏向角</h3>
+<div class="read"><span>δmin（數值搜尋）</span><b id="r_dmin">—</b></div>
+<div class="read"><span>對應入射角 i（= e）</span><b id="r_imin">—</b></div>
+<div class="read"><span>由公式反推 n</span><b id="r_nchk">—</b></div>
+<div class="read"><span>可出射的入射角範圍</span><b id="r_range">—</b></div>
+<p class="note">下圖為 δ–i 曲線：黃點是目前入射角，紅點是最小偏向角。在最小偏向時 i = e、r₁ = r₂ = A/2，光線在稜鏡內與底邊平行。實驗上量 A 與 δmin 即可求出折射率。</p>
+</div></div>
+<script>const $=id=>document.getElementById(id),D2R=Math.PI/180,R2D=180/Math.PI;
+const val=id=>parseFloat($(id).value);
+const out=(id,t)=>{const e=$(id);if(e)e.innerHTML=t;};
+const f=(x,d=2)=>Number.isFinite(x)?x.toFixed(d):'—';
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1];
+const FONT='"Segoe UI","Helvetica Neue",Arial,"Noto Sans TC","Noto Sans CJK TC","PingFang TC","Microsoft JhengHei","Noto Sans","DejaVu Sans",sans-serif';
+window.onerror=m=>{document.body.setAttribute('data-err',String(m));};
+function setup(cv){const r=window.devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;if(cv.width!==Math.round(w*r)||cv.height!==Math.round(h*r)){cv.width=Math.round(w*r);cv.height=Math.round(h*r);}const c=cv.getContext('2d');c.setTransform(r,0,0,r,0,0);c.clearRect(0,0,w,h);return{c,w,h};}
+function line(c,x1,y1,x2,y2,col,lw=2,dash){c.save();c.strokeStyle=col;c.lineWidth=lw;if(dash)c.setLineDash(dash);c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();c.restore();}
+function ray(c,x1,y1,x2,y2,col,lw=3,alpha=1,at=0.5){c.save();c.globalAlpha=Math.max(0,Math.min(1,alpha));line(c,x1,y1,x2,y2,col,lw);const mx=x1+(x2-x1)*at,my=y1+(y2-y1)*at,a=Math.atan2(y2-y1,x2-x1),s=6+lw*1.5;c.fillStyle=col;c.beginPath();c.moveTo(mx+s*Math.cos(a),my+s*Math.sin(a));c.lineTo(mx+s*Math.cos(a+2.6),my+s*Math.sin(a+2.6));c.lineTo(mx+s*Math.cos(a-2.6),my+s*Math.sin(a-2.6));c.closePath();c.fill();c.restore();}
+function arcA(c,x,y,r,a1,a2,col,lw=1.6){let d=a2-a1;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;c.save();c.strokeStyle=col;c.lineWidth=lw;c.beginPath();c.arc(x,y,r,a1,a1+d,d<0);c.stroke();c.restore();}
+function text(c,s,x,y,col='#e8ecff',size=15,align='left',bold){c.save();c.fillStyle=col;c.font=`${bold?'bold ':''}${size}px ${FONT}`;c.textAlign=align;c.fillText(s,x,y);c.restore();}
+function refractV(d,nr,n1,n2){const ci=-dot(nr,d),e=n1/n2,k=1-e*e*(1-ci*ci);if(k<0)return null;const s=e*ci-Math.sqrt(k);return[e*d[0]+s*nr[0],e*d[1]+s*nr[1]];}
+function reflectV(d,nr){const k=2*dot(d,nr);return[d[0]-k*nr[0],d[1]-k*nr[1]];}
+function rot(v,a){const c=Math.cos(a),s=Math.sin(a);return[v[0]*c-v[1]*s,v[0]*s+v[1]*c];}
+function fresnelR(n1,n2,ti){const st=n1/n2*Math.sin(ti);if(st>=1)return 1;const tt=Math.asin(st),ci=Math.cos(ti),ct=Math.cos(tt);const rs=((n1*ci-n2*ct)/(n1*ci+n2*ct))**2,rp=((n1*ct-n2*ci)/(n1*ct+n2*ci))**2;return(rs+rp)/2;}
+function medium(n){return `rgba(90,160,255,${Math.min(0.04+(n-1)*0.28,0.55).toFixed(3)})`;}
+function plot(cv,o){const {c,w,h}=setup(cv);const L=46,Rr=12,T=14,B=30;const X=x=>L+(x-o.x0)/(o.x1-o.x0)*(w-L-Rr),Y=y=>h-B-(y-o.y0)/(o.y1-o.y0)*(h-T-B);
+ c.strokeStyle='#26305a';c.lineWidth=1;
+ (o.xt||[]).forEach(t=>{line(c,X(t),T,X(t),h-B,'#1f2a50',1);text(c,String(t),X(t),h-B+15,'#8a96c0',11,'center');});
+ (o.yt||[]).forEach(t=>{line(c,L,Y(t),w-Rr,Y(t),'#1f2a50',1);text(c,String(t),L-5,Y(t)+4,'#8a96c0',11,'right');});
+ line(c,L,T,L,h-B,'#5a6799',1.2);line(c,L,h-B,w-Rr,h-B,'#5a6799',1.2);
+ c.save();c.beginPath();c.rect(L,T,w-L-Rr,h-T-B);c.clip();
+ (o.hl||[]).forEach(s=>line(c,L,Y(s.y),w-Rr,Y(s.y),s.col,1.2,[5,4]));
+ (o.series||[]).forEach(s=>{c.strokeStyle=s.col;c.lineWidth=s.lw||2;if(s.dash)c.setLineDash(s.dash);else c.setLineDash([]);c.beginPath();let pen=false;s.pts.forEach(p=>{if(!p||!Number.isFinite(p[1])){pen=false;return;}const px=X(p[0]),py=Y(p[1]);pen?c.lineTo(px,py):c.moveTo(px,py);pen=true;});c.stroke();});
+ c.restore();
+ (o.marks||[]).forEach(m=>{if(!Number.isFinite(m.y))return;c.fillStyle=m.col;c.beginPath();c.arc(X(m.x),Y(m.y),5,0,7);c.fill();if(m.label)text(c,m.label,X(m.x)+(m.dx||8),Y(m.y)+(m.dy||-8),m.col,12,m.align||'left');});
+ text(c,o.xl||'',w-Rr,h-4,'#9fb0e0',12,'right');text(c,o.yl||'',L+4,T+10,'#9fb0e0',12);
+ (o.legend||[]).forEach((g,i)=>{line(c,w-150,T+10+i*16,w-128,T+10+i*16,g.col,2.5,g.dash);text(c,g.t,w-122,T+14+i*16,'#cfd8ff',12);});
+ return{c,X,Y};}
+function syncLabels(){document.querySelectorAll('input[type=range]').forEach(e=>{const b=$('v_'+e.id);if(b){const d=+(e.dataset.d??(e.step.includes('.')?e.step.split('.')[1].length:0));b.textContent=parseFloat(e.value).toFixed(d)+(e.dataset.u||'');}});}
+function bindAll(fn){new URLSearchParams(location.search).forEach((v,k)=>{const e=$(k);if(!e)return;if(e.type==='checkbox')e.checked=v==='1';else e.value=v;});const g=()=>{syncLabels();fn();};document.querySelectorAll('input,select').forEach(e=>{e.addEventListener('input',g);e.addEventListener('change',g);});window.addEventListener('resize',g);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(g);g();}
+function sl(id,label,min,max,step,v,u=''){return '';}
+
+function prismPts(cx,top,S,A){const h2=A/2;return[[cx,top],[cx+S*Math.sin(h2),top+S*Math.cos(h2)],[cx-S*Math.sin(h2),top+S*Math.cos(h2)]];}
+function outN(poly){const cx=(poly[0][0]+poly[1][0]+poly[2][0])/3,cy=(poly[0][1]+poly[1][1]+poly[2][1])/3;return poly.map((p,i)=>{const q=poly[(i+1)%poly.length];let n=[q[1]-p[1],-(q[0]-p[0])];const l=Math.hypot(n[0],n[1]);n=[n[0]/l,n[1]/l];if(dot(n,[(p[0]+q[0])/2-cx,(p[1]+q[1])/2-cy])<0)n=[-n[0],-n[1]];return n;});}
+function segHit(P,d,a,b){const e=[b[0]-a[0],b[1]-a[1]],den=d[0]*e[1]-d[1]*e[0];if(Math.abs(den)<1e-12)return null;const w=[a[0]-P[0],a[1]-P[1]],t=(w[0]*e[1]-w[1]*e[0])/den,u=(w[0]*d[1]-w[1]*d[0])/den;if(u<-1e-9||u>1+1e-9)return null;return t;}
+// enter prism through left face (edge 2) at fraction fr from apex with incidence i (rad). returns {pts, exit, inDir, tir}
+function tracePrism(poly,i,n,fr){const ns=outN(poly),A=poly[0],B=poly[2];const E=[A[0]+(B[0]-A[0])*fr,A[1]+(B[1]-A[1])*fr];const inward=[-ns[2][0],-ns[2][1]];const d0=rot(inward,-i);
+ let d=refractV(d0,ns[2],1,n);const pts=[E];let P=E,cur=2,tir=false;
+ for(let k=0;k<6;k++){let best=Infinity,bi=-1;for(let j=0;j<3;j++){if(j===cur)continue;const t=segHit(P,d,poly[j],poly[(j+1)%3]);if(t!==null&&t>1e-6&&t<best){best=t;bi=j;}}
+  if(bi<0)break;P=[P[0]+d[0]*best,P[1]+d[1]*best];pts.push(P);const t=refractV(d,[-ns[bi][0],-ns[bi][1]],n,1);
+  if(t)return{E,d0,pts,exit:t,edge:bi,tir};tir=true;d=reflectV(d,ns[bi]);cur=bi;}
+ return{E,d0,pts,exit:null,tir:true};}
+function prismDev(n,A,i){const r1=Math.asin(Math.sin(i)/n),r2=A-r1,s=n*Math.sin(r2);if(Math.abs(s)>1)return NaN;return i+Math.asin(s)-A;}
+function minDev(n,A){let best=Infinity,bi=NaN;for(let i=0;i<=90;i+=0.02){const d=prismDev(n,A,i*D2R);if(d<best){best=d;bi=i;}}if(!Number.isFinite(best))return{d:NaN,i:NaN};
+ const ia=Math.asin(Math.min(1,n*Math.sin(A/2)));return{d:2*ia-A,i:ia*R2D};}
+
+const cv=$('cv');
+$('gomin').onclick=()=>{const m=minDev(val('n'),val('A')*D2R);if(Number.isFinite(m.i)){$('i1').value=m.i.toFixed(1);syncLabels();draw();}};
+function draw(){
+ const {c,w,h}=setup(cv);const n=val('n'),A=val('A')*D2R,i1=val('i1')*D2R;
+ const S=Math.min(300,h*0.78),cx=w*0.36,top=40,poly=prismPts(cx,top,S,A);
+ c.beginPath();c.moveTo(...poly[0]);c.lineTo(...poly[1]);c.lineTo(...poly[2]);c.closePath();c.fillStyle=medium(n);c.fill();c.strokeStyle='#9fc0ff';c.lineWidth=1.5;c.stroke();
+ arcA(c,poly[0][0],poly[0][1],30,Math.PI/2-A/2,Math.PI/2+A/2,'#cfe0ff');text(c,`A=${f(A*R2D,0)}°`,poly[0][0]+28,poly[0][1]+8,'#cfe0ff',14,'left',1);
+ const tr=tracePrism(poly,i1,n,0.5),E=tr.E,d0=tr.d0,ns=outN(poly);
+ line(c,E[0]-ns[2][0]*60,E[1]-ns[2][1]*60,E[0]+ns[2][0]*70,E[1]+ns[2][1]*70,'#8890b0',1,[5,5]);
+ ray(c,E[0]-d0[0]*260,E[1]-d0[1]*260,E[0],E[1],'#ffd84d',3.5);
+ arcA(c,E[0],E[1],40,Math.atan2(ns[2][1],ns[2][0]),Math.atan2(-d0[1],-d0[0]),'#ffd84d',2);text(c,`i=${f(i1*R2D,1)}°`,E[0]-48,E[1]+44,'#ffd84d',14,'right',1);
+ for(let k=0;k+1<tr.pts.length;k++)ray(c,tr.pts[k][0],tr.pts[k][1],tr.pts[k+1][0],tr.pts[k+1][1],'#ffd84d',3);
+ const dv=prismDev(n,A,i1);
+ if(tr.exit&&!tr.tir){const P=tr.pts[tr.pts.length-1];ray(c,P[0],P[1],P[0]+tr.exit[0]*420,P[1]+tr.exit[1]*420,'#ffd84d',3.5,1,0.4);
+  line(c,P[0]-ns[0][0]*60,P[1]-ns[0][1]*60,P[0]+ns[0][0]*70,P[1]+ns[0][1]*70,'#8890b0',1,[5,5]);
+  arcA(c,P[0],P[1],40,Math.atan2(ns[0][1],ns[0][0]),Math.atan2(tr.exit[1],tr.exit[0]),'#7ff0c8',2);text(c,`e=${f((dv+A-i1)*R2D,1)}°`,P[0]+46,P[1]-30,'#7ff0c8',14,'left',1);
+  line(c,E[0],E[1],E[0]+d0[0]*520,E[1]+d0[1]*520,'rgba(255,255,255,.35)',1.2,[3,6]);
+  const den=d0[0]*tr.exit[1]-d0[1]*tr.exit[0];if(Math.abs(den)>1e-6){const t=((P[0]-E[0])*tr.exit[1]-(P[1]-E[1])*tr.exit[0])/den,X=[E[0]+d0[0]*t,E[1]+d0[1]*t],a1=Math.atan2(d0[1],d0[0]),a2=Math.atan2(tr.exit[1],tr.exit[0]);arcA(c,X[0],X[1],150,a1,a2,'#ff9a9a',2);text(c,`δ = ${f(dv*R2D,2)}°`,X[0]+158*Math.cos((a1+a2)/2),X[1]+158*Math.sin((a1+a2)/2)+16,'#ff9a9a',16,'left',1);}}
+ else text(c,'光在第二面發生全反射，無法出射（請加大入射角）',20,h-16,'#ff7b7b',16,'left',1);
+ const r1=Math.asin(Math.sin(i1)/n),r2=A-r1,e=dv+A-i1,md=minDev(n,A);
+ out('r_r1',f(r1*R2D,2)+'°');out('r_r2',f(r2*R2D,2)+'°');out('r_e',Number.isFinite(dv)?f(e*R2D,2)+'°':'<span class="tir">全反射</span>');out('r_d',Number.isFinite(dv)?f(dv*R2D,2)+'°':'—');
+ // numeric search for min
+ let best=Infinity,bi=NaN,lo=NaN;const pts=[];for(let a=0;a<=90;a+=0.1){const d=prismDev(n,A,a*D2R)*R2D;pts.push([a,d]);if(Number.isFinite(d)){if(!Number.isFinite(lo))lo=a;if(d<best){best=d;bi=a;}}}
+ out('r_dmin',Number.isFinite(best)?f(best,2)+'°':'—（無法出射）');out('r_imin',Number.isFinite(bi)?f(bi,1)+'°':'—');
+ out('r_nchk',Number.isFinite(best)?f(Math.sin((A+best*D2R)/2)/Math.sin(A/2),4)+`（設定 n = ${f(n,2)}）`:'—');
+ out('r_range',Number.isFinite(lo)?`${f(lo,1)}° ～ 90°`:'無（A 太大或 n 太大）');
+ const fin=pts.filter(p=>Number.isFinite(p[1])).map(p=>p[1]);const ymin=fin.length?Math.floor(Math.min(...fin)/5)*5-5:0,ymax=fin.length?Math.ceil(Math.max(...fin)/5)*5+5:90;
+ const yt=[];const stp=(ymax-ymin)>60?20:10;for(let y=Math.ceil(ymin/stp)*stp;y<=ymax;y+=stp)yt.push(y);
+ plot($('pl'),{x0:0,x1:90,y0:ymin,y1:ymax,xt:[0,15,30,45,60,75,90],yt,xl:'入射角 i (°)',yl:'偏向角 δ (°)',hl:Number.isFinite(best)?[{y:best,col:'rgba(255,120,120,.5)'}]:[],series:[{pts,col:'#7aa2ff',lw:2.5}],
+  marks:[{x:bi,y:best,col:'#ff7b7b',label:`δmin = ${f(best,2)}°`,dy:22,dx:-10},{x:i1*R2D,y:dv*R2D,col:'#ffd84d',label:'目前',dy:-10}]});
+}
+bindAll(draw);
+</script></body></html>

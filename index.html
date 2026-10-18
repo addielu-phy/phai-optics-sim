@@ -1,0 +1,45 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI × 幾何光學：從解題引導到互動模擬的建模學習</title><style>*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI","Helvetica Neue",Arial,"Noto Sans TC","Noto Sans CJK TC","PingFang TC","Microsoft JhengHei","Noto Sans","DejaVu Sans",sans-serif;background:#0d1224;color:#e8ecff}
+header{padding:10px 20px;display:flex;align-items:baseline;gap:16px;border-bottom:1px solid #253055}
+header h1{font-size:22px;margin:0;white-space:nowrap}header p{margin:0;color:#9fb0e0;font-size:14px}
+header a{margin-left:auto;color:#8fb3ff;text-decoration:none;font-size:14px;white-space:nowrap}
+.wrap{display:grid;grid-template-columns:1fr 350px;gap:14px;padding:12px 16px}
+.stage{display:flex;flex-direction:column;gap:10px}
+#cv{width:100%;height:650px;background:#060a18;border-radius:12px;display:block}
+.panel{background:#131a33;border:1px solid #26305a;border-radius:12px;padding:10px 14px;font-size:14px;max-height:650px;overflow:auto}
+.ctl{margin:6px 0}.ctl label{display:flex;justify-content:space-between}.ctl b{color:#ffd84d;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:#7aa2ff;margin:2px 0}
+.read{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dashed #2a3560}.read b{color:#7ff0c8;font-variant-numeric:tabular-nums}
+h3{font-size:15px;margin:10px 0 4px;color:#a9c1ff}
+.note{color:#9fb0e0;font-size:13px;line-height:1.55;margin:6px 0}
+.formula{background:#0b1022;border-radius:8px;padding:5px 10px;margin:5px 0;font-family:"Cambria Math","Times New Roman",serif;font-size:16px;text-align:center}
+.mini{width:100%;height:180px;background:#060a18;border-radius:8px;display:block;margin-top:6px}
+.btns{display:flex;flex-wrap:wrap;gap:3px;align-items:center}
+.btns button{background:#1d2850;color:#e8ecff;border:1px solid #34437a;border-radius:6px;padding:2px 7px;cursor:pointer;font-size:12px}
+.btns button:hover{background:#2a3a70}
+.chk{display:flex;gap:6px;align-items:center;margin:6px 0}
+select{background:#1d2850;color:#e8ecff;border:1px solid #34437a;border-radius:6px;padding:3px}
+table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}td,th{padding:2px 4px;text-align:right;border-bottom:1px solid #222c50}th{color:#a9c1ff;font-weight:normal}
+.bar{height:10px;background:#0b1022;border-radius:5px;overflow:hidden;margin:2px 0 6px}.bar span{display:block;height:100%;background:#ffd84d}
+.tir{color:#ff7b7b;font-weight:bold}.ok{color:#7ff0c8;font-weight:bold}
+@media(max-width:900px){.wrap{grid-template-columns:1fr}#cv{height:480px}.panel{max-height:none}}
+
+.hero{max-width:1100px;margin:0 auto;padding:36px 22px 10px}.hero h1{font-size:30px;margin:0 0 8px}.hero p{color:#9fb0e0;margin:4px 0}
+.grid{max-width:1100px;margin:0 auto;padding:16px 22px 40px;display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+a.card{display:block;background:#131a33;border:1px solid #26305a;border-radius:14px;padding:18px 20px;color:#e8ecff;text-decoration:none;transition:.15s}
+a.card:hover{border-color:#7aa2ff;transform:translateY(-2px)}a.card h2{margin:0 0 6px;font-size:20px;color:#a9c1ff}a.card .f{font-family:"Cambria Math","Times New Roman",serif;color:#ffd84d;margin:6px 0}a.card p{margin:0;color:#b8c4ea;font-size:14px;line-height:1.6}
+.num{display:inline-block;width:26px;height:26px;border-radius:50%;background:#2a3a70;text-align:center;line-height:26px;margin-right:8px;font-size:14px;color:#fff}
+footer{text-align:center;color:#6f7aa6;font-size:13px;padding:0 0 30px}</style></head><body>
+<div class="hero"><h1>AI × 幾何光學：從解題引導到互動模擬的建模學習</h1>
+<p>PhAI 共學圈 10/21 分享｜講者：盧政良</p>
+<p>六個高中幾何光學互動模擬：拖曳滑桿改變參數，即時觀察光路與數值。所有頁面皆為單一 HTML 檔，可直接下載離線使用。</p></div>
+<div class="grid">
+<a class="card" href="snell.html"><h2><span class="num">1</span>司乃耳定律</h2><div class="f">n₁ sin θ₁ = n₂ sin θ₂</div><p>調整兩介質折射率與入射角，數值驗證折射定律，並觀察 θ₂–θ₁ 曲線。</p></a>
+<a class="card" href="total_internal_reflection.html"><h2><span class="num">2</span>全反射與光纖</h2><div class="f">sin θ<sub>c</sub> = n₂ / n₁</div><p>超過臨界角折射光消失；菲涅耳強度提示、光纖導光與數值孔徑。</p></a>
+<a class="card" href="lateral_shift.html"><h2><span class="num">3</span>平行玻璃磚側位移</h2><div class="f">d = t · sin(θ₁ − θ₂) / cos θ₂</div><p>出射光與入射光平行但側移；比較公式值與作圖量測值。</p></a>
+<a class="card" href="apparent_depth.html"><h2><span class="num">4</span>視深與實深</h2><div class="f">h′ = h · n₂ / n₁（近法線）</div><p>水中物體看起來變淺；比較近法線近似、鉛直線作法與斜看時的實際成像位置。</p></a>
+<a class="card" href="deviation_prism.html"><h2><span class="num">5</span>稜鏡偏向角</h2><div class="f">n = sin((A+δ<sub>min</sub>)/2) / sin(A/2)</div><p>δ–i 曲線與最小偏向角，用 A 與 δmin 反推折射率。</p></a>
+<a class="card" href="dispersion.html"><h2><span class="num">6</span>三稜鏡色散與彩虹</h2><div class="f">n(λ) = A₀ + B / λ²</div><p>白光經稜鏡分成七色，比較各色偏向角；附水滴主虹光路。</p></a>
+</div><footer>PhAI 共學圈｜幾何光學互動模擬</footer>
+</body></html>

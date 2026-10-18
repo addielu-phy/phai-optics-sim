@@ -1,0 +1,126 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>全反射與光纖｜幾何光學互動模擬</title><style>*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI","Helvetica Neue",Arial,"Noto Sans TC","Noto Sans CJK TC","PingFang TC","Microsoft JhengHei","Noto Sans","DejaVu Sans",sans-serif;background:#0d1224;color:#e8ecff}
+header{padding:10px 20px;display:flex;align-items:baseline;gap:16px;border-bottom:1px solid #253055}
+header h1{font-size:22px;margin:0;white-space:nowrap}header p{margin:0;color:#9fb0e0;font-size:14px}
+header a{margin-left:auto;color:#8fb3ff;text-decoration:none;font-size:14px;white-space:nowrap}
+.wrap{display:grid;grid-template-columns:1fr 350px;gap:14px;padding:12px 16px}
+.stage{display:flex;flex-direction:column;gap:10px}
+#cv{width:100%;height:650px;background:#060a18;border-radius:12px;display:block}
+.panel{background:#131a33;border:1px solid #26305a;border-radius:12px;padding:10px 14px;font-size:14px;max-height:650px;overflow:auto}
+.ctl{margin:6px 0}.ctl label{display:flex;justify-content:space-between}.ctl b{color:#ffd84d;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:#7aa2ff;margin:2px 0}
+.read{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dashed #2a3560}.read b{color:#7ff0c8;font-variant-numeric:tabular-nums}
+h3{font-size:15px;margin:10px 0 4px;color:#a9c1ff}
+.note{color:#9fb0e0;font-size:13px;line-height:1.55;margin:6px 0}
+.formula{background:#0b1022;border-radius:8px;padding:5px 10px;margin:5px 0;font-family:"Cambria Math","Times New Roman",serif;font-size:16px;text-align:center}
+.mini{width:100%;height:180px;background:#060a18;border-radius:8px;display:block;margin-top:6px}
+.btns{display:flex;flex-wrap:wrap;gap:3px;align-items:center}
+.btns button{background:#1d2850;color:#e8ecff;border:1px solid #34437a;border-radius:6px;padding:2px 7px;cursor:pointer;font-size:12px}
+.btns button:hover{background:#2a3a70}
+.chk{display:flex;gap:6px;align-items:center;margin:6px 0}
+select{background:#1d2850;color:#e8ecff;border:1px solid #34437a;border-radius:6px;padding:3px}
+table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}td,th{padding:2px 4px;text-align:right;border-bottom:1px solid #222c50}th{color:#a9c1ff;font-weight:normal}
+.bar{height:10px;background:#0b1022;border-radius:5px;overflow:hidden;margin:2px 0 6px}.bar span{display:block;height:100%;background:#ffd84d}
+.tir{color:#ff7b7b;font-weight:bold}.ok{color:#7ff0c8;font-weight:bold}
+@media(max-width:900px){.wrap{grid-template-columns:1fr}#cv{height:480px}.panel{max-height:none}}
+</style></head><body>
+<header><h1>全反射與光纖</h1><p>光由光密介質射向光疏介質，入射角超過臨界角時，折射光消失，全部反射。</p><a href="index.html">← 返回目錄</a></header>
+<div class="wrap"><div class="stage"><canvas id="cv"></canvas></div>
+<div class="panel">
+<h3>參數</h3>
+<div class="ctl"><label for="th">入射角 θ₁<b id="v_th"></b></label><input type="range" id="th" min="0" max="89.5" step="0.5" value="50" data-u="°"></div>
+<div class="ctl"><label for="n1">介質 1 折射率 n₁（入射側）<b id="v_n1"></b></label><input type="range" id="n1" min="1.00" max="2.50" step="0.01" value="1.50" data-u=""></div>
+<div class="ctl"><label for="n2">介質 2 折射率 n₂<b id="v_n2"></b></label><input type="range" id="n2" min="1.00" max="2.50" step="0.01" value="1.00" data-u=""></div>
+<div class="btns">快速設定：<button data-p="1.50,1.00">玻璃→空氣</button><button data-p="1.33,1.00">水→空氣</button><button data-p="2.42,1.00">鑽石→空氣</button><button data-p="1.48,1.46">光纖芯→披覆</button><button data-p="1.00,1.50">空氣→玻璃</button></div>
+<div class="formula">sin θ<sub>c</sub> = n₂ / n₁</div>
+<h3>即時數據</h3>
+<div class="read"><span>臨界角 θc</span><b id="r_tc">—</b></div>
+<div class="read"><span>(n₁/n₂)·sin θ₁</span><b id="r_s2">—</b></div>
+<div class="read"><span>折射角 θ₂</span><b id="r_t2">—</b></div>
+<div class="read"><span>狀態</span><b id="r_state">—</b></div>
+<div class="read"><span>反射光強度 R</span><b id="r_R">—</b></div><div class="bar"><span id="barR"></span></div>
+<div class="read"><span>折射光強度 T</span><b id="r_T">—</b></div><div class="bar"><span id="barT" style="background:#7ff0c8"></span></div>
+<p class="note">強度依菲涅耳公式（非偏振光，s、p 平均）計算；光線粗細與亮度代表強度。接近臨界角時，折射光愈來愈弱、反射光愈來愈強。</p>
+<h3>光纖示意</h3>
+<label class="chk"><input type="checkbox" id="fib" checked>顯示光纖（纖芯 n₁、披覆 n₂）</label>
+<div class="ctl"><label for="al">光從空氣射入光纖端面的角度 α<b id="v_al"></b></label><input type="range" id="al" min="0" max="89" step="1" value="30" data-u="°"></div>
+<div class="read"><span>數值孔徑 NA = √(n₁²−n₂²)</span><b id="r_na">—</b></div>
+<div class="read"><span>最大接收角 αmax</span><b id="r_amax">—</b></div>
+</div></div>
+<script>const $=id=>document.getElementById(id),D2R=Math.PI/180,R2D=180/Math.PI;
+const val=id=>parseFloat($(id).value);
+const out=(id,t)=>{const e=$(id);if(e)e.innerHTML=t;};
+const f=(x,d=2)=>Number.isFinite(x)?x.toFixed(d):'—';
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1];
+const FONT='"Segoe UI","Helvetica Neue",Arial,"Noto Sans TC","Noto Sans CJK TC","PingFang TC","Microsoft JhengHei","Noto Sans","DejaVu Sans",sans-serif';
+window.onerror=m=>{document.body.setAttribute('data-err',String(m));};
+function setup(cv){const r=window.devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;if(cv.width!==Math.round(w*r)||cv.height!==Math.round(h*r)){cv.width=Math.round(w*r);cv.height=Math.round(h*r);}const c=cv.getContext('2d');c.setTransform(r,0,0,r,0,0);c.clearRect(0,0,w,h);return{c,w,h};}
+function line(c,x1,y1,x2,y2,col,lw=2,dash){c.save();c.strokeStyle=col;c.lineWidth=lw;if(dash)c.setLineDash(dash);c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();c.restore();}
+function ray(c,x1,y1,x2,y2,col,lw=3,alpha=1,at=0.5){c.save();c.globalAlpha=Math.max(0,Math.min(1,alpha));line(c,x1,y1,x2,y2,col,lw);const mx=x1+(x2-x1)*at,my=y1+(y2-y1)*at,a=Math.atan2(y2-y1,x2-x1),s=6+lw*1.5;c.fillStyle=col;c.beginPath();c.moveTo(mx+s*Math.cos(a),my+s*Math.sin(a));c.lineTo(mx+s*Math.cos(a+2.6),my+s*Math.sin(a+2.6));c.lineTo(mx+s*Math.cos(a-2.6),my+s*Math.sin(a-2.6));c.closePath();c.fill();c.restore();}
+function arcA(c,x,y,r,a1,a2,col,lw=1.6){let d=a2-a1;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;c.save();c.strokeStyle=col;c.lineWidth=lw;c.beginPath();c.arc(x,y,r,a1,a1+d,d<0);c.stroke();c.restore();}
+function text(c,s,x,y,col='#e8ecff',size=15,align='left',bold){c.save();c.fillStyle=col;c.font=`${bold?'bold ':''}${size}px ${FONT}`;c.textAlign=align;c.fillText(s,x,y);c.restore();}
+function refractV(d,nr,n1,n2){const ci=-dot(nr,d),e=n1/n2,k=1-e*e*(1-ci*ci);if(k<0)return null;const s=e*ci-Math.sqrt(k);return[e*d[0]+s*nr[0],e*d[1]+s*nr[1]];}
+function reflectV(d,nr){const k=2*dot(d,nr);return[d[0]-k*nr[0],d[1]-k*nr[1]];}
+function rot(v,a){const c=Math.cos(a),s=Math.sin(a);return[v[0]*c-v[1]*s,v[0]*s+v[1]*c];}
+function fresnelR(n1,n2,ti){const st=n1/n2*Math.sin(ti);if(st>=1)return 1;const tt=Math.asin(st),ci=Math.cos(ti),ct=Math.cos(tt);const rs=((n1*ci-n2*ct)/(n1*ci+n2*ct))**2,rp=((n1*ct-n2*ci)/(n1*ct+n2*ci))**2;return(rs+rp)/2;}
+function medium(n){return `rgba(90,160,255,${Math.min(0.04+(n-1)*0.28,0.55).toFixed(3)})`;}
+function plot(cv,o){const {c,w,h}=setup(cv);const L=46,Rr=12,T=14,B=30;const X=x=>L+(x-o.x0)/(o.x1-o.x0)*(w-L-Rr),Y=y=>h-B-(y-o.y0)/(o.y1-o.y0)*(h-T-B);
+ c.strokeStyle='#26305a';c.lineWidth=1;
+ (o.xt||[]).forEach(t=>{line(c,X(t),T,X(t),h-B,'#1f2a50',1);text(c,String(t),X(t),h-B+15,'#8a96c0',11,'center');});
+ (o.yt||[]).forEach(t=>{line(c,L,Y(t),w-Rr,Y(t),'#1f2a50',1);text(c,String(t),L-5,Y(t)+4,'#8a96c0',11,'right');});
+ line(c,L,T,L,h-B,'#5a6799',1.2);line(c,L,h-B,w-Rr,h-B,'#5a6799',1.2);
+ c.save();c.beginPath();c.rect(L,T,w-L-Rr,h-T-B);c.clip();
+ (o.hl||[]).forEach(s=>line(c,L,Y(s.y),w-Rr,Y(s.y),s.col,1.2,[5,4]));
+ (o.series||[]).forEach(s=>{c.strokeStyle=s.col;c.lineWidth=s.lw||2;if(s.dash)c.setLineDash(s.dash);else c.setLineDash([]);c.beginPath();let pen=false;s.pts.forEach(p=>{if(!p||!Number.isFinite(p[1])){pen=false;return;}const px=X(p[0]),py=Y(p[1]);pen?c.lineTo(px,py):c.moveTo(px,py);pen=true;});c.stroke();});
+ c.restore();
+ (o.marks||[]).forEach(m=>{if(!Number.isFinite(m.y))return;c.fillStyle=m.col;c.beginPath();c.arc(X(m.x),Y(m.y),5,0,7);c.fill();if(m.label)text(c,m.label,X(m.x)+(m.dx||8),Y(m.y)+(m.dy||-8),m.col,12,m.align||'left');});
+ text(c,o.xl||'',w-Rr,h-4,'#9fb0e0',12,'right');text(c,o.yl||'',L+4,T+10,'#9fb0e0',12);
+ (o.legend||[]).forEach((g,i)=>{line(c,w-150,T+10+i*16,w-128,T+10+i*16,g.col,2.5,g.dash);text(c,g.t,w-122,T+14+i*16,'#cfd8ff',12);});
+ return{c,X,Y};}
+function syncLabels(){document.querySelectorAll('input[type=range]').forEach(e=>{const b=$('v_'+e.id);if(b){const d=+(e.dataset.d??(e.step.includes('.')?e.step.split('.')[1].length:0));b.textContent=parseFloat(e.value).toFixed(d)+(e.dataset.u||'');}});}
+function bindAll(fn){new URLSearchParams(location.search).forEach((v,k)=>{const e=$(k);if(!e)return;if(e.type==='checkbox')e.checked=v==='1';else e.value=v;});const g=()=>{syncLabels();fn();};document.querySelectorAll('input,select').forEach(e=>{e.addEventListener('input',g);e.addEventListener('change',g);});window.addEventListener('resize',g);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(g);g();}
+function sl(id,label,min,max,step,v,u=''){return '';}
+
+const cv=$('cv');
+document.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{const [a,c]=b.dataset.p.split(',');$('n1').value=a;$('n2').value=c;syncLabels();draw();});
+function draw(){
+ const {c,w,h}=setup(cv);
+ const n1=val('n1'),n2=val('n2'),th=val('th')*D2R,fib=$('fib').checked;
+ const H=fib?Math.round(h*0.62):h,y0=Math.round(H*0.5),x0=Math.round(w*0.5),L=Math.min(w*0.42,H*0.44);
+ c.fillStyle=medium(n1);c.fillRect(0,0,w,y0);c.fillStyle=medium(n2);c.fillRect(0,y0,w,H-y0);
+ line(c,0,y0,w,y0,'#9fb0e0',1.5);
+ text(c,`介質 1　n₁ = ${f(n1)}`,16,28,'#cfe0ff',16);text(c,`介質 2　n₂ = ${f(n2)}`,16,y0+28,'#cfe0ff',16);
+ line(c,x0,y0-L-10,x0,y0+L+10,'#8890b0',1,[6,6]);text(c,'法線',x0+6,y0-L,'#8890b0',13);
+ const s2=n1/n2*Math.sin(th),tir=s2>1,R=fresnelR(n1,n2,th),T=1-R,tc=n1>n2?Math.asin(n2/n1):NaN;
+ if(n1>n2){const a=-Math.PI/2-tc,q=L*0.95;line(c,x0,y0,x0+q*Math.cos(a),y0+q*Math.sin(a),'rgba(255,120,120,.7)',1.5,[4,5]);text(c,`臨界角 ${f(tc*R2D,1)}°`,x0+q*Math.cos(a)-6,y0+q*Math.sin(a)-4,'#ff9a9a',13,'right');}
+ ray(c,x0-L*Math.sin(th),y0-L*Math.cos(th),x0,y0,'#ffd84d',4);
+ const xr=x0+L*Math.sin(th),yr=y0-L*Math.cos(th);
+ ray(c,x0,y0,xr,yr,'#ffd84d',1+3.5*R,0.15+0.85*R);
+ text(c,`反射 ${f(R*100,1)}%`,x0+(xr-x0)*0.62+12,y0+(yr-y0)*0.62,'#ffe9a0',14);
+ arcA(c,x0,y0,52,-Math.PI/2-th,-Math.PI/2,'#ffd84d',2);text(c,`θ₁ = ${f(th*R2D,1)}°`,x0-10,y0-62,'#ffd84d',15,'right',1);
+ if(!tir){const t2=Math.asin(s2),xt=x0+L*Math.sin(t2),yt=y0+L*Math.cos(t2);ray(c,x0,y0,xt,yt,'#ffd84d',1+3.5*T,0.15+0.85*T);arcA(c,x0,y0,58,Math.PI/2-t2,Math.PI/2,'#7ff0c8',2);text(c,`θ₂ = ${f(t2*R2D,1)}°`,x0-10,y0+78,'#7ff0c8',15,'right',1);text(c,`折射 ${f(T*100,1)}%`,x0+(xt-x0)*0.62+12,y0+(yt-y0)*0.62+16,'#bff7e4',14);}
+ else{text(c,'全反射！',x0+40,y0+56,'#ff7b7b',24,'left',1);text(c,'沒有折射光進入介質 2，光能量 100% 反射',x0+40,y0+84,'#ff9a9a',15);}
+ out('r_tc',n1>n2?f(tc*R2D,2)+'°':'不存在（n₁ ≤ n₂）');out('r_s2',f(s2,4));out('r_t2',tir?'—':f(Math.asin(s2)*R2D,2)+'°');
+ out('r_state',tir?'<span class="tir">全反射</span>':'<span class="ok">部分反射＋折射</span>');
+ out('r_R',f(R*100,1)+'%');out('r_T',f(T*100,1)+'%');$('barR').style.width=(R*100)+'%';$('barT').style.width=(T*100)+'%';
+ const NA=n1>n2?Math.sqrt(n1*n1-n2*n2):0;out('r_na',n1>n2?f(NA,3):'—（需 n₁ > n₂）');out('r_amax',n1>n2?(NA>=1?'90°（任何角度皆可導光）':f(Math.asin(NA)*R2D,1)+'°'):'—');
+ if(!fib)return;
+ const top=H+8,bh=h-H-8;c.fillStyle='#091128';c.fillRect(0,top,w,bh);line(c,0,top,w,top,'#26305a',1);
+ const xL=170,xR=w-14,yc=top+bh/2+12,ch=Math.min(76,bh*0.36),cl=24,al=val('al')*D2R;
+ c.fillStyle='rgba(150,170,220,.16)';c.fillRect(xL,yc-ch/2-cl,xR-xL,ch+2*cl);c.fillStyle=medium(n2);c.fillRect(xL,yc-ch/2-cl,xR-xL,ch+2*cl);c.fillStyle='rgba(120,190,255,.10)';c.fillRect(xL,yc-ch/2,xR-xL,ch);c.fillStyle=medium(n1);c.fillRect(xL,yc-ch/2,xR-xL,ch);
+ line(c,xL,yc-ch/2-cl,xR,yc-ch/2-cl,'#5a6799',1);line(c,xL,yc+ch/2+cl,xR,yc+ch/2+cl,'#5a6799',1);line(c,xL,yc-ch/2,xR,yc-ch/2,'#9fb0e0',1);line(c,xL,yc+ch/2,xR,yc+ch/2,'#9fb0e0',1);line(c,xL,yc-ch/2-cl,xL,yc+ch/2+cl,'#9fb0e0',1);
+ text(c,'光纖剖面：纖芯 n₁、披覆 n₂',16,top+22,'#cfe0ff',15);text(c,'空氣 n = 1',16,yc-ch/2-cl-6,'#8a96c0',13);
+ text(c,'披覆 n₂',xR-8,yc-ch/2-7,'#9fb0e0',12,'right');text(c,'纖芯 n₁',xR-8,yc+5,'#cfe0ff',12,'right');
+ const b=Math.asin(Math.sin(al)/n1),phi=Math.PI/2-b,guided=n1*Math.sin(phi)>n2;
+ const Lin=130;ray(c,xL-Lin*Math.cos(al),yc+Lin*Math.sin(al),xL,yc,'#ffd84d',3);arcA(c,xL,yc,34,Math.PI,Math.PI-al,'#ffd84d');text(c,`α=${f(al*R2D,0)}°`,xL-40,yc+30,'#ffd84d',13,'right');
+ let p=[xL,yc],d=[Math.cos(b),-Math.sin(b)],I=1,n=0;
+ while(n<120&&I>0.02){const tw=d[1]<0?((yc-ch/2)-p[1])/d[1]:d[1]>0?((yc+ch/2)-p[1])/d[1]:Infinity,tx=(xR-p[0])/d[0];
+  if(tx<=tw){line(c,p[0],p[1],xR,p[1]+d[1]*tx,`rgba(255,216,77,${I})`,2.5);break;}
+  const q=[p[0]+d[0]*tw,p[1]+d[1]*tw];line(c,p[0],p[1],q[0],q[1],`rgba(255,216,77,${I})`,2.5);
+  if(!guided){const ang=Math.asin(Math.min(1,n1*Math.sin(phi)/n2)),T2=1-fresnelR(n1,n2,phi),ln=cl*1.6;line(c,q[0],q[1],q[0]+Math.sin(ang)*ln,q[1]+Math.sign(d[1])*Math.cos(ang)*ln,`rgba(255,140,90,${Math.min(1,I*T2+0.25)})`,2);I*=(1-T2);}
+  d=[d[0],-d[1]];p=q;n++;}
+ text(c,guided?'光在纖芯與披覆界面不斷全反射，被導向前方 ✔':'入射角太大：在界面不滿足全反射，光逐次外漏 ✘',xL,top+bh-10,guided?'#7ff0c8':'#ff9a7b',15);
+}
+bindAll(draw);
+</script></body></html>
