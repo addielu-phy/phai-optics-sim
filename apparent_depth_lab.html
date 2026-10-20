@@ -1,0 +1,245 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>視深實驗室｜幾何光學互動模擬</title><style>*{box-sizing:border-box}
+body{margin:0;font-family:"Noto Sans TC","Noto Sans CJK TC","PingFang TC","Microsoft JhengHei","Segoe UI",Arial,sans-serif;background:#f4f7f8;color:#24323a}
+header{padding:12px 22px;display:flex;align-items:baseline;gap:16px;background:#fff;border-bottom:1px solid #dfe8ea}
+header h1{font-size:22px;margin:0;color:#1f6f78;white-space:nowrap}header p{margin:0;color:#5b6d74;font-size:14px}
+header a{margin-left:auto;color:#1f6f78;text-decoration:none;font-size:14px;white-space:nowrap}
+main{max-width:1240px;margin:0 auto;padding:12px 18px 40px}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 10px}
+.tabs button{background:#fff;border:1px solid #cfdadd;border-radius:8px;padding:7px 14px;font-size:14px;font-weight:600;color:#24323a;cursor:pointer}
+.tabs button.on{background:#1f6f78;border-color:#1f6f78;color:#fff}
+.stagewrap{display:flex;gap:10px}
+.box{background:#fff;border:1px solid #dfe8ea;border-radius:12px;overflow:hidden}
+#cv{width:100%;height:470px;display:block}
+#fish{width:330px;height:470px;display:block;background:#111;flex:none}
+.tl{display:flex;align-items:center;gap:10px;background:#f3eefc;border:1px solid #e0d6f5;border-radius:10px;padding:8px 12px;margin:10px 0;font-size:13px;color:#4a3a78}
+.tl button{background:#fff;border:1px solid #cfc3ea;border-radius:6px;width:26px;height:24px;cursor:pointer;color:#5b3fb0}
+.tl input[type=range]{accent-color:#6b3fc8;flex:1}.tl .sp{width:110px;flex:none}.tl b{font-variant-numeric:tabular-nums;min-width:46px;text-align:right}
+.ctrls{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px 22px;margin:4px 0 8px}
+.ctl label{display:flex;justify-content:space-between;font-size:13px;font-weight:600}.ctl label b{color:#1f6f78}
+.ctl input[type=range]{width:100%;accent-color:#1f8a94}
+.ctl select{width:100%;padding:6px;border:2px solid #c99a2e;border-radius:7px;font-size:13px;background:#fff;margin-top:3px}
+.ctl.chk label{justify-content:flex-start;gap:6px;align-items:center;margin-top:18px}
+.acts{display:flex;gap:8px;margin:8px 0}.acts button{background:#fff;border:1px solid #cfdadd;border-radius:7px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin:10px 0}
+.card{background:#eef8f8;border:1px solid #cfe6e8;border-radius:9px;padding:9px 12px}
+.card span{display:block;font-size:12px;color:#4e6268}.card b{display:block;font-size:18px;margin-top:4px;font-variant-numeric:tabular-nums}
+details{background:#fdf3ec;border-left:4px solid #e08a3c;border-radius:6px;padding:8px 14px;margin:10px 0;font-size:14px;line-height:1.7}
+details summary{cursor:pointer;font-weight:600}
+.layers{font-size:13px;border-collapse:collapse;margin:6px 0}.layers td,.layers th{padding:3px 8px;border-bottom:1px solid #e3ecee;text-align:center}
+.tir{color:#c0304a;font-weight:700}.ok{color:#1f6f78;font-weight:700}
+h2.sec{font-size:18px;margin:26px 0 2px}.sub{color:#5b6d74;font-size:13px;margin:0 0 10px}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.gc{background:#fff;border:1px solid #dfe8ea;border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+.gc .ph{position:relative;height:150px}.gc .ph canvas,.gc .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.gc .ph em{position:absolute;left:6px;bottom:5px;font-size:11px;color:#fff;background:rgba(0,0,0,.45);padding:1px 6px;border-radius:4px;font-style:normal}
+.gc h4{margin:8px 10px 4px;font-size:14px}.gc p{margin:0 10px 6px;font-size:12.5px;line-height:1.55;color:#40525a}.gc .cr{color:#8a979c;font-size:11.5px}
+.gc button{margin:auto 10px 10px;align-self:flex-start;background:#fff;border:1px solid #cfdadd;border-radius:7px;padding:5px 10px;font-weight:600;cursor:pointer}
+.chips{margin:0 10px 6px}.chips span{display:inline-block;border:1px solid #9ccfd4;color:#1f6f78;border-radius:12px;padding:1px 8px;font-size:11.5px;margin:2px 2px 0 0}
+@media(max-width:900px){.stagewrap{flex-direction:column}#fish{width:100%;height:330px}}
+</style></head><body>
+<header><h1>視深實驗室</h1><p>近法線時像深 = Σt·n<sub>眼</sub>/n；把視線斜一點，看像如何偏離公式、往觀察者靠近。</p><a href="index.html">← 返回目錄</a></header>
+<main><div class="tabs" id="tabs"></div>
+<div class="stagewrap"><div class="box" style="flex:1"><canvas id="cv"></canvas></div></div>
+<div class="tl">⏱ 時間軸 <button id="tlp">◀</button><input type="range" id="tlr" min="0" max="1000" value="0"><button id="tln">▶</button><b id="tlv">0.00 s</b>｜播放速度 0.1× <input class="sp" type="range" id="sp" min="0.1" max="1.5" step="0.1" value="1"> 1.5× <b id="spv">目前 1.0×</b></div>
+<div class="ctrls" id="ctrls"></div>
+<div class="acts"><button id="pp">⏸ 暫停</button><button id="rs">↺ 回到預設值</button></div>
+<div class="cards" id="cards"></div>
+<details id="note"></details>
+</main>
+<script>const $=id=>document.getElementById(id),D2R=Math.PI/180,R2D=180/Math.PI;
+const val=id=>parseFloat($(id).value);
+const out=(id,t)=>{const e=$(id);if(e)e.innerHTML=t;};
+const f=(x,d=2)=>Number.isFinite(x)?x.toFixed(d):'—';
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1];
+const FONT='"Segoe UI","Helvetica Neue",Arial,"Noto Sans TC","Noto Sans CJK TC","PingFang TC","Microsoft JhengHei","Noto Sans","DejaVu Sans",sans-serif';
+window.onerror=m=>{document.body.setAttribute('data-err',String(m));};
+function setup(cv){const r=window.devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;if(cv.width!==Math.round(w*r)||cv.height!==Math.round(h*r)){cv.width=Math.round(w*r);cv.height=Math.round(h*r);}const c=cv.getContext('2d');c.setTransform(r,0,0,r,0,0);c.clearRect(0,0,w,h);return{c,w,h};}
+function line(c,x1,y1,x2,y2,col,lw=2,dash){c.save();c.strokeStyle=col;c.lineWidth=lw;if(dash)c.setLineDash(dash);c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();c.restore();}
+function ray(c,x1,y1,x2,y2,col,lw=3,alpha=1,at=0.5){c.save();c.globalAlpha=Math.max(0,Math.min(1,alpha));line(c,x1,y1,x2,y2,col,lw);const mx=x1+(x2-x1)*at,my=y1+(y2-y1)*at,a=Math.atan2(y2-y1,x2-x1),s=6+lw*1.5;c.fillStyle=col;c.beginPath();c.moveTo(mx+s*Math.cos(a),my+s*Math.sin(a));c.lineTo(mx+s*Math.cos(a+2.6),my+s*Math.sin(a+2.6));c.lineTo(mx+s*Math.cos(a-2.6),my+s*Math.sin(a-2.6));c.closePath();c.fill();c.restore();}
+function arcA(c,x,y,r,a1,a2,col,lw=1.6){let d=a2-a1;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;c.save();c.strokeStyle=col;c.lineWidth=lw;c.beginPath();c.arc(x,y,r,a1,a1+d,d<0);c.stroke();c.restore();}
+function text(c,s,x,y,col='#e8ecff',size=15,align='left',bold){c.save();c.fillStyle=col;c.font=`${bold?'bold ':''}${size}px ${FONT}`;c.textAlign=align;c.fillText(s,x,y);c.restore();}
+function refractV(d,nr,n1,n2){const ci=-dot(nr,d),e=n1/n2,k=1-e*e*(1-ci*ci);if(k<0)return null;const s=e*ci-Math.sqrt(k);return[e*d[0]+s*nr[0],e*d[1]+s*nr[1]];}
+function reflectV(d,nr){const k=2*dot(d,nr);return[d[0]-k*nr[0],d[1]-k*nr[1]];}
+function rot(v,a){const c=Math.cos(a),s=Math.sin(a);return[v[0]*c-v[1]*s,v[0]*s+v[1]*c];}
+function fresnelR(n1,n2,ti){const st=n1/n2*Math.sin(ti);if(st>=1)return 1;const tt=Math.asin(st),ci=Math.cos(ti),ct=Math.cos(tt);const rs=((n1*ci-n2*ct)/(n1*ci+n2*ct))**2,rp=((n1*ct-n2*ci)/(n1*ct+n2*ci))**2;return(rs+rp)/2;}
+function medium(n){return `rgba(90,160,255,${Math.min(0.04+(n-1)*0.28,0.55).toFixed(3)})`;}
+function plot(cv,o){const {c,w,h}=setup(cv);const L=46,Rr=12,T=14,B=30;const X=x=>L+(x-o.x0)/(o.x1-o.x0)*(w-L-Rr),Y=y=>h-B-(y-o.y0)/(o.y1-o.y0)*(h-T-B);
+ c.strokeStyle='#26305a';c.lineWidth=1;
+ (o.xt||[]).forEach(t=>{line(c,X(t),T,X(t),h-B,'#1f2a50',1);text(c,String(t),X(t),h-B+15,'#8a96c0',11,'center');});
+ (o.yt||[]).forEach(t=>{line(c,L,Y(t),w-Rr,Y(t),'#1f2a50',1);text(c,String(t),L-5,Y(t)+4,'#8a96c0',11,'right');});
+ line(c,L,T,L,h-B,'#5a6799',1.2);line(c,L,h-B,w-Rr,h-B,'#5a6799',1.2);
+ c.save();c.beginPath();c.rect(L,T,w-L-Rr,h-T-B);c.clip();
+ (o.hl||[]).forEach(s=>line(c,L,Y(s.y),w-Rr,Y(s.y),s.col,1.2,[5,4]));
+ (o.series||[]).forEach(s=>{c.strokeStyle=s.col;c.lineWidth=s.lw||2;if(s.dash)c.setLineDash(s.dash);else c.setLineDash([]);c.beginPath();let pen=false;s.pts.forEach(p=>{if(!p||!Number.isFinite(p[1])){pen=false;return;}const px=X(p[0]),py=Y(p[1]);pen?c.lineTo(px,py):c.moveTo(px,py);pen=true;});c.stroke();});
+ c.restore();
+ (o.marks||[]).forEach(m=>{if(!Number.isFinite(m.y))return;c.fillStyle=m.col;c.beginPath();c.arc(X(m.x),Y(m.y),5,0,7);c.fill();if(m.label)text(c,m.label,X(m.x)+(m.dx||8),Y(m.y)+(m.dy||-8),m.col,12,m.align||'left');});
+ text(c,o.xl||'',w-Rr,h-4,'#9fb0e0',12,'right');text(c,o.yl||'',L+4,T+10,'#9fb0e0',12);
+ (o.legend||[]).forEach((g,i)=>{line(c,w-150,T+10+i*16,w-128,T+10+i*16,g.col,2.5,g.dash);text(c,g.t,w-122,T+14+i*16,'#cfd8ff',12);});
+ return{c,X,Y};}
+function syncLabels(){document.querySelectorAll('input[type=range]').forEach(e=>{const b=$('v_'+e.id);if(b){const d=+(e.dataset.d??(e.step.includes('.')?e.step.split('.')[1].length:0));b.textContent=parseFloat(e.value).toFixed(d)+(e.dataset.u||'');}});}
+function bindAll(fn){new URLSearchParams(location.search).forEach((v,k)=>{const e=$(k);if(!e)return;if(e.type==='checkbox')e.checked=v==='1';else e.value=v;});const g=()=>{syncLabels();fn();};document.querySelectorAll('input,select').forEach(e=>{e.addEventListener('input',g);e.addEventListener('change',g);});window.addEventListener('resize',g);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(g);g();}
+function sl(id,label,min,max,step,v,u=''){return '';}
+
+// shared light UI: tabs, timeline, controls
+const UI={T:4,t:0,play:true,speed:1,tab:0,tabs:[],last:0};
+function partial(c,pts,p,col,lw=2.5,dash){let L=0;const seg=[];for(let i=1;i<pts.length;i++){const d=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);seg.push(d);L+=d;}let rem=L*Math.max(0,Math.min(1,p));c.save();c.strokeStyle=col;c.lineWidth=lw;if(dash)c.setLineDash(dash);c.beginPath();c.moveTo(pts[0][0],pts[0][1]);let end=pts[0];for(let i=1;i<pts.length&&rem>0;i++){const k=Math.min(1,rem/seg[i-1]);end=[pts[i-1][0]+(pts[i][0]-pts[i-1][0])*k,pts[i-1][1]+(pts[i][1]-pts[i-1][1])*k];c.lineTo(end[0],end[1]);rem-=seg[i-1];}c.stroke();c.restore();return end;}
+function txt(c,s,x,y,col='#24323a',size=12,align='left',bold){c.save();c.fillStyle=col;c.font=`${bold?'bold ':''}${size}px "Noto Sans TC","Noto Sans CJK TC",sans-serif`;c.textAlign=align;c.fillText(s,x,y);c.restore();}
+function tag(c,s,x,y,col,bg='rgba(255,255,255,.85)',size=11){c.save();c.font=`${size}px "Noto Sans TC","Noto Sans CJK TC",sans-serif`;const w=c.measureText(s).width+8;c.fillStyle=bg;c.fillRect(x-2,y-size,w,size+5);c.strokeStyle=col;c.lineWidth=.8;c.strokeRect(x-2,y-size,w,size+5);c.fillStyle=col;c.fillText(s,x+2,y);c.restore();}
+function lsetup(cv){const r=window.devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;if(cv.width!==Math.round(w*r)||cv.height!==Math.round(h*r)){cv.width=Math.round(w*r);cv.height=Math.round(h*r);}const c=cv.getContext('2d');c.setTransform(r,0,0,r,0,0);c.clearRect(0,0,w,h);return{c,w,h};}
+function eyeIcon(c,x,y,ang=0,s=1){c.save();c.translate(x,y);c.rotate(ang);c.scale(s,s);c.fillStyle='#fff';c.strokeStyle='#222';c.lineWidth=1.5;c.beginPath();c.ellipse(0,0,11,7,0,0,7);c.fill();c.stroke();c.fillStyle='#222';c.beginPath();c.arc(0,0,3.6,0,7);c.fill();c.restore();}
+function V(id){const e=$(id);if(!e)return NaN;if(e.type==='checkbox')return e.checked;return e.tagName==='SELECT'?e.value:parseFloat(e.value);}
+function buildCtrls(tab){const box=$('ctrls');box.innerHTML='';(tab.ctrls||[]).forEach(k=>{const d=document.createElement('div');d.className='ctl';
+ if(k.sel){d.innerHTML=`<label>${k.label}</label><select id="${k.id}">${k.sel.map(o=>`<option value="${o[0]}"${o[0]==k.v?' selected':''}>${o[1]}</option>`).join('')}</select>`;}
+ else if(k.chk){d.className='ctl chk';d.innerHTML=`<label><input type="checkbox" id="${k.id}"${k.v?' checked':''}>${k.label}</label>`;}
+ else d.innerHTML=`<label for="${k.id}">${k.label}<b id="v_${k.id}"></b></label><input type="range" id="${k.id}" min="${k.min}" max="${k.max}" step="${k.step}" value="${k.v}" data-u="${k.u||''}">`;
+ box.appendChild(d);});
+ box.querySelectorAll('input,select').forEach(e=>{e.addEventListener('input',()=>{syncL();if(tab.onchange)tab.onchange(e.id);render();});});
+ $('cards').innerHTML=(tab.cards||[]).map(k=>`<div class="card"><span>${k[1]}</span><b id="${k[0]}">—</b></div>`).join('');
+ $('note').innerHTML='<summary>觀察後的補充說明</summary>'+(tab.note||'');syncL();}
+function syncL(){document.querySelectorAll('#ctrls input[type=range]').forEach(e=>{const b=$('v_'+e.id);if(b){const st=e.step.includes('.')?e.step.split('.')[1].length:0;b.textContent=parseFloat(e.value).toFixed(st)+(e.dataset.u||'');}});}
+function setTab(i){UI.tab=i;document.querySelectorAll('.tabs button').forEach((b,j)=>b.classList.toggle('on',j===i));buildCtrls(UI.tabs[i]);if(UI.tabs[i].init)UI.tabs[i].init();UI.t=0;render();}
+function resetTab(){setTab(UI.tab);}
+function render(){const tb=UI.tabs[UI.tab];$('tlr').value=UI.t/UI.T*1000;$('tlv').textContent=UI.t.toFixed(2)+' s';try{tb.draw(Math.min(1,UI.t/(UI.T*0.8)));}catch(e){document.body.setAttribute('data-err',String(e&&e.stack||e));throw e;}}
+function initUI(tabs){UI.tabs=tabs;$('tabs').innerHTML=tabs.map((t,i)=>`<button>${t.name}</button>`).join('');document.querySelectorAll('.tabs button').forEach((b,i)=>b.onclick=()=>setTab(i));
+ $('tlr').oninput=e=>{UI.t=e.target.value/1000*UI.T;render();};$('tlp').onclick=()=>{UI.t=Math.max(0,UI.t-0.1);render();};$('tln').onclick=()=>{UI.t=Math.min(UI.T,UI.t+0.1);render();};
+ $('sp').oninput=e=>{UI.speed=+e.target.value;$('spv').textContent='目前 '+UI.speed.toFixed(1)+'×';};
+ $('pp').onclick=()=>{UI.play=!UI.play;$('pp').textContent=UI.play?'⏸ 暫停':'▶ 播放';};$('rs').onclick=resetTab;
+ window.addEventListener('resize',render);
+ const q=new URLSearchParams(location.search);setTab(Math.min(tabs.length-1,+(q.get('tab')||0)));if(q.has('t')){UI.t=+q.get('t');UI.play=false;$('pp').textContent='▶ 播放';render();}
+ function loop(ts){const dt=Math.min(0.05,(ts-(UI.last||ts))/1000);UI.last=ts;if(UI.play){UI.t+=dt*UI.speed;if(UI.t>UI.T)UI.t=0;render();}requestAnimationFrame(loop);}requestAnimationFrame(loop);}
+
+const cv=$('cv');
+// ---------- physics: layers listed from the object outward; exit surface at v=0 ----------
+function trace(layers,nOut,a){const s0=layers[0].n*Math.sin(a);let u=0;const th=[];for(const L of layers){const s=s0/L.n;if(s>=1)return null;const t=Math.asin(s);th.push(t);u+=L.t*Math.tan(t);}const so=s0/nOut;if(so>=1)return null;return{u,th,out:Math.asin(so)};}
+function amax(layers,nOut){const m=Math.min(nOut,...layers.map(l=>l.n));return Math.asin(Math.min(1,m/layers[0].n))-1e-6;}
+function solveEye(layers,nOut,U,Vh){const f=a=>{const r=trace(layers,nOut,a);return r?r.u+Vh*Math.tan(r.out)-U:1e9;};let lo=0,hi=amax(layers,nOut);if(f(hi)<0)return null;for(let i=0;i<80;i++){const m=(lo+hi)/2;f(m)>0?hi=m:lo=m;}return(lo+hi)/2;}
+function image(layers,nOut,a){const r=trace(layers,nOut,a);if(!r)return null;if(a<1e-4){const y=layers.reduce((s,L)=>s+L.t*nOut/L.n,0);return{u:0,y};}const e=1e-6,r1=trace(layers,nOut,a-e),r2=trace(layers,nOut,a+e);if(!r1||!r2)return null;const y=(r2.u-r1.u)/(Math.tan(r2.out)-Math.tan(r1.out));return{u:r.u-y*Math.tan(r.out),y};}
+function parax(layers,nOut){return layers.reduce((s,L)=>s+L.t*nOut/L.n,0);}
+// generic scene drawer. map(u,v)->[x,y]
+function scene(c,o,p){const{layers,nOut,U,Vh,map}=o;const sg=U<0?-1:1;const T=layers.reduce((s,l)=>s+l.t,0);
+ const a=solveEye(layers,nOut,Math.abs(U),Vh);if(a==null)return null;const r=trace(layers,nOut,a);const im=image(layers,nOut,a);
+ const pts=[[0,-T]];let v=-T,u=0;layers.forEach((L,i)=>{v+=L.t;u+=L.t*Math.tan(r.th[i]);pts.push([sg*u,v]);});pts.push([U,Vh]);
+ const P=pts.map(q=>map(q[0],q[1]));const end=partial(c,P,p,'#1f7f8c',2.6);
+ // back extension
+ if(p>0.85&&im){const ex=map(pts[pts.length-2][0],0),ix=map(sg*im.u,-im.y);partial(c,[ex,ix],(p-0.85)/0.15,'#c0304a',1.6,[6,4]);if(p>=0.999){c.fillStyle='rgba(192,48,74,.25)';c.strokeStyle='#c0304a';c.beginPath();c.arc(ix[0],ix[1],6,0,7);c.fill();c.stroke();}}
+ return{a,r,im,T,pts,sg};}
+function mapper(w,h,box){const[u0,u1,v0,v1]=box;const s=Math.min((w-40)/(u1-u0),(h-30)/(v1-v0));const ox=20+((w-40)-(u1-u0)*s)/2-u0*s,oy=15+((h-30)-(v1-v0)*s)/2+v1*s;return{s,map:(u,v)=>[ox+u*s,oy-v*s]};}
+function fillBand(c,map,u0,u1,va,vb,col){const A=map(u0,va),B=map(u1,vb);c.fillStyle=col;c.fillRect(Math.min(A[0],B[0]),Math.min(A[1],B[1]),Math.abs(B[0]-A[0]),Math.abs(B[1]-A[1]));}
+function hline(c,map,u0,u1,v,col,lw=1,dash){const A=map(u0,v),B=map(u1,v);line(c,A[0],A[1],B[0],B[1],col,lw,dash);}
+function fishIcon(c,x,y,col='#e0882e'){c.save();c.fillStyle=col;c.beginPath();c.ellipse(x,y,13,6,0,0,7);c.fill();c.beginPath();c.moveTo(x+11,y);c.lineTo(x+20,y-6);c.lineTo(x+20,y+6);c.fill();c.fillStyle='#222';c.beginPath();c.arc(x-7,y-1,1.6,0,7);c.fill();c.restore();}
+function birdIcon(c,x,y,col='#5a4bb0'){c.save();c.strokeStyle=col;c.lineWidth=2.5;c.beginPath();c.moveTo(x-12,y-4);c.quadraticCurveTo(x-6,y-9,x,y);c.quadraticCurveTo(x+6,y-9,x+12,y-4);c.stroke();c.restore();}
+const AIR='#eef5f9',WATER='#cfe4ea',GLASS='#b9d7d0',GROUND='#e5ddd0';
+const out2=(id,s)=>{const e=$(id);if(e)e.textContent=s;};
+const deg=x=>(x*R2D).toFixed(1)+'°';
+// ---------- tab 1: drag eye ----------
+const EYE={u:2.6,v:1.2};
+cv.addEventListener('pointerdown',e=>{cv._drag=true;dragEye(e);});cv.addEventListener('pointermove',e=>{if(cv._drag)dragEye(e);});window.addEventListener('pointerup',()=>cv._drag=false);
+function dragEye(e){if(UI.tab!==0||!cv._m)return;const r=cv.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;EYE.u=(x-cv._m.ox)/cv._m.s;EYE.v=(cv._m.oy-y)/cv._m.s;EYE.u=Math.max(-0.2,Math.min(4.5,EYE.u));EYE.v=Math.max(-2.3,Math.min(2.3,EYE.v));if(Math.abs(EYE.v)<0.08)EYE.v=EYE.v<0?-0.08:0.08;render();}
+const tabs=[
+{name:'拖曳眼睛：看魚也看鳥',ctrls:[{id:'fd',label:'魚的深度',min:0.3,max:2,step:0.1,v:1.2,u:' m'},{id:'bh',label:'鳥的高度',min:0.3,max:2,step:0.1,v:1.4,u:' m'},{id:'n',label:'水的折射率 n',min:1.0,max:2.0,step:0.01,v:1.33}],
+ init(){EYE.u=2.6;EYE.v=1.2;},
+ cards:[['c1','眼睛位置'],['c2','魚：實深 → 看到的深度'],['c3','鳥：實高 → 看到的高度'],['c4','提示']],
+ note:'<p>眼睛在空氣中：魚看起來變淺（像深 ≈ 實深 / n），鳥沒有經過界面，位置不變。把眼睛拖進水裡：魚的位置不變，鳥卻看起來變高（像高 ≈ n × 實高）。斜著看時像會再往觀察者靠近，偏離 D/n 的程度隨視線角度增大。</p>',
+ draw(p){const{c,w,h}=lsetup(cv);const n=V('n'),fd=V('fd'),bh=V('bh');const s=Math.min((w-40)/5.2,(h-30)/4.8),ox=w/2-1.6*s-60,oy=h/2;cv._m={s,ox,oy};const map=(u,v)=>[ox+u*s,oy-v*s];
+  c.fillStyle=AIR;c.fillRect(0,0,w,oy);c.fillStyle=WATER;c.fillRect(0,oy,w,h-oy);line(c,0,oy,w,oy,'#6b8f99',1.5);txt(c,'空氣 n = 1.00',8,oy-8,'#3d5560');txt(c,'水 n = '+n.toFixed(2),8,oy+18,'#3d5560');
+  const F=[-0.8,-fd],B=[0.6,bh];const fp=map(...F),bp=map(...B);fishIcon(c,fp[0],fp[1]);birdIcon(c,bp[0],bp[1]);
+  const inAir=EYE.v>0;const E=[EYE.u,EYE.v];const ep=map(...E);
+  let fishImg='—',birdImg='—';
+  // fish
+  if(inAir){const R=scene(c,{layers:[{n,t:fd}],nOut:1,U:E[0]-F[0],Vh:E[1],map:(u,v)=>map(F[0]+u,v)},p);if(R&&R.im){const ip=map(F[0]+R.sg*R.im.u,-R.im.y);if(p>=.999){c.globalAlpha=.55;fishIcon(c,ip[0],ip[1],'#c0304a');c.globalAlpha=1;}fishImg=`${fd.toFixed(2)} m → ${R.im.y.toFixed(2)} m（D/n = ${(fd/n).toFixed(2)} m）`;}}
+  else{partial(c,[fp,ep],p,'#1f7f8c',2.6);fishImg='同在水中，不折射';}
+  if(!inAir){const R=scene(c,{layers:[{n:1,t:bh}],nOut:n,U:E[0]-B[0],Vh:-E[1],map:(u,v)=>map(B[0]+u,-v)},p);if(R&&R.im){const ip=map(B[0]+R.sg*R.im.u,R.im.y);if(p>=.999){c.globalAlpha=.55;birdIcon(c,ip[0],ip[1],'#c0304a');c.globalAlpha=1;}birdImg=`${bh.toFixed(2)} m → ${R.im.y.toFixed(2)} m（n·H = ${(n*bh).toFixed(2)} m）`;}else birdImg='在斯涅爾窗外，看不到';}
+  else{partial(c,[bp,ep],p,'#1f7f8c',2.6);birdImg='同在空氣中，不折射';}
+  eyeIcon(c,ep[0],ep[1],0,1.3);tag(c,'拖曳我',ep[0]+16,ep[1]-10,'#1f6f78');
+  out2('c1',inAir?'空氣中（高 '+E[1].toFixed(2)+' m）':'水中（深 '+(-E[1]).toFixed(2)+' m）');out2('c2',fishImg);out2('c3',birdImg);out2('c4',inAir?'把眼睛拖入水中試試':'把眼睛拖回空氣');
+  $('c2').style.fontSize=$('c3').style.fontSize='15px';}},
+{name:'岸上看水中',ctrls:[{id:'D',label:'物體深度',min:0.3,max:3,step:0.1,v:1.5,u:' m'},{id:'X',label:'眼睛水平距離',min:0,max:5,step:0.1,v:2.5,u:' m'},{id:'H',label:'眼睛高出水面',min:0.2,max:3,step:0.1,v:1.2,u:' m'},{id:'n',label:'水的折射率 n',min:1.0,max:2.0,step:0.01,v:1.33}],
+ cards:[['c1','視線與鉛直夾角'],['c2','正上方公式 D/n'],['c3','斜看時的實際像深'],['c4','像往觀察者移近']],
+ note:'<p>像的位置取「兩條相鄰光線反向延長線的交點」。正上方看（夾角 → 0）時像深 = D/n；越斜看，像越淺，而且往觀察者方向移動。課本公式只在近法線時成立。</p>',
+ draw(p){deep(p,{D:V('D'),X:V('X'),H:V('H'),n:V('n')});}},
+{name:'斜看池底',ctrls:[{id:'X',label:'硬幣與池邊水平距離',min:0.5,max:6,step:0.1,v:3.0,u:' m'},{id:'D',label:'池水深度',min:0.5,max:3,step:0.1,v:2.0,u:' m'},{id:'H',label:'眼睛高出水面',min:0.3,max:3,step:0.1,v:1.6,u:' m'}],
+ cards:[['c1','視線與鉛直夾角'],['c2','正上方公式 D/n'],['c3','斜看時的視深'],['c4','像往觀察者移近']],
+ note:'<p>站在池邊斜看池底，紅線是「眼睛看到的池底」：每一點都用相鄰光線反向延長的交點求出。越遠處的池底被抬得越高，所以泳池看起來像往遠處變淺的碗，這也是很多人誤判水深的原因。虛線是正上方公式 D/n，只有在眼睛正下方附近才準。</p><p>本頁 n = 1.33。預設值（3.0 m、2.0 m、1.6 m）得到夾角 46.6°、視深 0.83 m（41%）、像往觀察者移近 0.43 m。</p>',
+ draw(p){pool(p);}},
+{name:'水中看岸上',ctrls:[{id:'B',label:'物體（鳥）高出水面',min:0.3,max:3,step:0.1,v:1.5,u:' m'},{id:'X',label:'眼睛水平距離',min:0,max:5,step:0.1,v:2.0,u:' m'},{id:'E',label:'眼睛在水面下深度',min:0.2,max:3,step:0.1,v:1.2,u:' m'},{id:'n',label:'水的折射率 n',min:1.0,max:2.0,step:0.01,v:1.33}],
+ cards:[['c1','水中視線與鉛直夾角'],['c2','正上方公式 n·H'],['c3','斜看時的實際像高'],['c4','像的水平位移（負值＝遠離觀察者）']],
+ note:'<p>從水裡往上看，空氣中的物體看起來「變高」：近正上方時像高 ≈ n × 實高。視線夾角不能超過臨界角 48.8°（n = 1.33），否則看到的是水面全反射的池底，岸上物體全都被壓縮在斯涅爾窗內。</p>',
+ draw(p){under(p);}},
+{name:'水族箱：空氣—玻璃—水',ctrls:[{id:'W',label:'魚到玻璃的距離（水）',min:5,max:60,step:1,v:30,u:' cm'},{id:'G',label:'玻璃厚度',min:0.5,max:5,step:0.5,v:1.5,u:' cm'},{id:'ng',label:'玻璃折射率',min:1.4,max:1.9,step:0.01,v:1.50},{id:'X',label:'眼睛側向偏移',min:0,max:60,step:1,v:25,u:' cm'},{id:'L',label:'眼睛到玻璃距離',min:10,max:80,step:1,v:40,u:' cm'}],
+ cards:[['c1','視線與玻璃法線夾角'],['c2','近法線公式 Σt/n'],['c3','斜看時的實際像距'],['c4','只看水層 W/1.33']],
+ note:'<p>多層介質時近法線像距 = Σ tᵢ · n<sub>眼</sub> / nᵢ：每層各自「縮短」再相加。玻璃很薄，對結果影響很小；主要的縮短來自水。斜看時像同樣會再靠近、並往觀察者偏移。（畫面為俯視，左側是水族箱內部。）</p>',
+ draw(p){tank(p);}},
+{name:'多層視深（2–6 層）',T:4,ctrls:[],init(){},cards:[['c1','最上層入射角 θ₁'],['c2','n₁ sin θ₁（不變量）'],['c3','結果'],['c4','近法線視深 Σt·n₁/nᵢ']],
+ note:'',draw(p){multi(p);}}
+];
+// ---------- tab 2 ----------
+function deep(p,{D,X,H,n}){const{c,w,h}=lsetup(cv);const{s,map}=mapper(w,h,[-1,Math.max(5.5,X+0.5),-3.2,3.2]);const sf=map(0,0)[1];
+ c.fillStyle=AIR;c.fillRect(0,0,w,sf);c.fillStyle=WATER;c.fillRect(0,sf,w,h-sf);line(c,0,sf,w,sf,'#6b8f99',1.5);txt(c,'空氣',8,sf-8,'#3d5560');txt(c,'水 n = '+n.toFixed(2),8,sf+18,'#3d5560');
+ const o=map(0,-D);fishIcon(c,o[0],o[1]);hline(c,map,-1,X+1,-D/n,'#7a5bc8',1,[5,4]);tag(c,'正上方公式 D/n = '+(D/n).toFixed(2)+' m',map(-0.9,0)[0],map(0,-D/n)[1]-4,'#5a3fb0');
+ const R=scene(c,{layers:[{n,t:D}],nOut:1,U:X,Vh:H,map},p);const e=map(X,H);eyeIcon(c,e[0],e[1],0,1.2);
+ if(R&&R.im){out2('c1',deg(R.r.out));out2('c2',(D/n).toFixed(2)+' m');out2('c3',`${R.im.y.toFixed(2)} m（${(R.im.y/D*100).toFixed(0)}%）`);out2('c4',(R.im.u).toFixed(2)+' m');}}
+// ---------- tab 3 pool ----------
+function pool(p){const{c,w,h}=lsetup(cv);const X=V('X'),D=V('D'),H=V('H'),n=1.33;const W=7;const{s,map}=mapper(w,h,[-2.2,W+0.3,-D-0.6,H+0.6]);
+ const sf=map(0,0)[1];c.fillStyle=AIR;c.fillRect(0,0,w,h);const g0=map(-2.2,0),g1=map(0,-D-0.6);c.fillStyle=GROUND;c.fillRect(0,sf,map(0,0)[0],h-sf);
+ const a0=map(0,0),a1=map(W,-D);c.fillStyle=WATER;c.fillRect(a0[0],a0[1],a1[0]-a0[0],a1[1]-a0[1]);c.fillStyle=GROUND;c.fillRect(map(0,-D)[0],a1[1],w,h-a1[1]);
+ line(c,a0[0],sf,a1[0],sf,'#6b8f99',1.5);txt(c,'空氣',a0[0]+6,sf-8,'#3d5560');tag(c,'水 n = 1.33',a0[0]+6,a1[1]-8,'#3d5560');
+ // eye: standing at pool edge (u=0)
+ const E=[0,H];// object at u=X
+ const ln=map(0,0),lt=map(0,H);line(c,ln[0],ln[1],lt[0],lt[1],'#8a979c',1);
+ hline(c,map,0,W,-D/n,'#7a5bc8',1,[5,4]);tag(c,'正上方公式 D/n = '+(D/n).toFixed(2)+' m',map(W-2.6,0)[0],map(0,-D/n)[1]-4,'#5a3fb0');
+ tag(c,'實際池底 D = '+D.toFixed(1)+' m',map(W-2.3,0)[0],a1[1]+16,'#5b4a30');tag(c,'紅線：看起來的池底',map(W-2.3,0)[0],a1[1]+32,'#c0304a');
+ // apparent bottom curve
+ c.save();c.strokeStyle='#c0304a';c.lineWidth=2;c.beginPath();let pen=false;for(let x=0.02;x<=W;x+=0.04){const a=solveEye([{n,t:D}],1,x,H);if(a==null)continue;const im=image([{n,t:D}],1,a);if(!im)continue;const q=map(x-im.u,-im.y);pen?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1]);pen=true;}c.stroke();c.restore();
+ // object coin & ray (traced from object toward eye at u=-X relative)
+ const R=scene(c,{layers:[{n,t:D}],nOut:1,U:-X,Vh:H,map:(u,v)=>map(X+u,v)},p);const ob=map(X,-D);c.fillStyle='#d9a62a';c.beginPath();c.ellipse(ob[0],ob[1]-2,8,3.5,0,0,7);c.fill();
+ const e=map(...E);eyeIcon(c,e[0],e[1],0.6,1.3);if(p>0.85)tag(c,'② 眼睛沿進入的方向反推 → 看到像',w-240,18,'#c0304a');else tag(c,'① 光從池底硬幣射向眼睛',w-200,18,'#1f6f78');
+ if(R&&R.im){out2('c1',deg(R.r.out));out2('c2',(D/n).toFixed(2)+' m');out2('c3',`${R.im.y.toFixed(2)} m（${(R.im.y/D*100).toFixed(0)}%）`);out2('c4',R.im.u.toFixed(2)+' m');}}
+// ---------- tab 4 under ----------
+function under(p){const{c,w,h}=lsetup(cv);const B=V('B'),X=V('X'),E=V('E'),n=V('n');const{s,map}=mapper(w,h,[-1,Math.max(5.5,X+0.5),-3.2,4.2]);const sf=map(0,0)[1];
+ c.fillStyle=AIR;c.fillRect(0,0,w,sf);c.fillStyle=WATER;c.fillRect(0,sf,w,h-sf);line(c,0,sf,w,sf,'#6b8f99',1.5);txt(c,'空氣',8,sf-8,'#3d5560');txt(c,'水 n = '+n.toFixed(2),8,sf+18,'#3d5560');
+ const b=map(0,B);birdIcon(c,b[0],b[1]);hline(c,map,-1,X+1,n*B,'#7a5bc8',1,[5,4]);tag(c,'正上方公式 n·H = '+(n*B).toFixed(2)+' m',map(-0.9,0)[0],map(0,n*B)[1]-4,'#5a3fb0');
+ const R=scene(c,{layers:[{n:1,t:B}],nOut:n,U:X,Vh:E,map:(u,v)=>map(u,-v)},p);const e=map(X,-E);eyeIcon(c,e[0],e[1],0,1.2);
+ if(R&&R.im){if(p>=.999){const q=map(R.sg*R.im.u,R.im.y);c.globalAlpha=.6;birdIcon(c,q[0],q[1],'#c0304a');c.globalAlpha=1;}out2('c1',deg(R.r.out));out2('c2',(n*B).toFixed(2)+' m');out2('c3',R.im.y.toFixed(2)+' m');out2('c4',R.im.u.toFixed(2)+' m');}
+ else{out2('c1','超過臨界角');out2('c3','看不到（在窗外）');out2('c4','—');}}
+// ---------- tab 5 tank (top view, horizontal) ----------
+function tank(p){const{c,w,h}=lsetup(cv);const Wd=V('W'),G=V('G'),ng=V('ng'),X=V('X'),L=V('L');const layers=[{n:1.33,t:Wd},{n:ng,t:G}];
+ const span=Wd+G+L+10,s=Math.min((w-60)/span,(h-40)/Math.max(70,X+20));const ox=30+5*s,oy=h/2+X*s/2;
+ const map=(u,v)=>[ox+(v+Wd+G)*s,oy-u*s];
+ const gx0=map(0,-G)[0],gx1=map(0,0)[0];c.fillStyle=WATER;c.fillRect(0,0,gx0,h);c.fillStyle=GLASS;c.fillRect(gx0,0,gx1-gx0,h);c.fillStyle=AIR;c.fillRect(gx1,0,w-gx1,h);
+ txt(c,'水 n = 1.33',10,20,'#3d5560');txt(c,'玻璃 n = '+ng.toFixed(2),gx0+3,h-30,'#2e5a50');txt(c,'空氣',gx1+8,20,'#3d5560');
+ const pr=parax(layers,1);const pl=map(0,-pr)[0];line(c,pl,0,pl,h,'#7a5bc8',1,[5,4]);tag(c,'近法線 Σt/n',pl+4,h-12,'#5a3fb0');
+ const o=map(0,-Wd-G);fishIcon(c,o[0],o[1]);const R=scene(c,{layers,nOut:1,U:X,Vh:L,map},p);const e=map(X,L);eyeIcon(c,e[0],e[1],Math.PI/2,1.2);
+ if(R&&R.im){if(p>=.999){const q=map(R.sg*R.im.u,-R.im.y);c.globalAlpha=.55;fishIcon(c,q[0],q[1],'#c0304a');c.globalAlpha=1;}out2('c1',deg(R.r.out));out2('c2',pr.toFixed(1)+' cm');out2('c3',R.im.y.toFixed(1)+' cm（距玻璃外表面）');out2('c4',(Wd/1.33).toFixed(1)+' cm + 玻璃 '+(G/ng).toFixed(1)+' cm');$('c3').style.fontSize='16px';}}
+// ---------- tab 6 multilayer ----------
+const MD={k:6,th:55,n:[1.70,1.50,1.30,1.60,1.40,1.00],t:[5,5,5,5,5,5]};
+tabs[5].ctrls=[{id:'mode',label:'情境',sel:[['tir','全反射判斷：光由最上層往下入射'],['depth','視深：從最上層斜看最下層底部物體']],v:'tir'},{id:'show',chk:1,label:'顯示各界面判斷（答案提示）',v:0},{id:'th',label:'最上層入射角 θ₁',min:0,max:85,step:1,v:55,u:'°'},{id:'k',label:'層數',min:2,max:6,step:1,v:6,u:' 層'}];
+const sub=['₁','₂','₃','₄','₅','₆'];for(let i=0;i<6;i++)tabs[5].ctrls.push({id:'n'+i,label:`第 ${i+1} 層折射率 n${sub[i]}`,min:1,max:2.5,step:0.01,v:MD.n[i]});for(let i=0;i<6;i++)tabs[5].ctrls.push({id:'t'+i,label:`第 ${i+1} 層厚度`,min:1,max:10,step:1,v:5,u:' cm'});
+tabs[5].note='<p>界面平行時 n·sinθ 在每一層都相同（= n₁ sin θ₁），所以只要比較 n₁ sin θ₁ 和下一層的 n：若 n₁ sin θ₁ ≥ nᵢ，光就在進入第 i 層前的界面全反射。中間某一層較大的 n 救不回來，關鍵永遠是「遇到的第一個夠小的 n」。預設 n₁ sin 55° = 1.393 > n₃ = 1.30，所以在 (B) 界面全反射。</p><p>「視深」情境：物體在最底層下緣，從最上層往下看，近法線視深 = Σ tᵢ · n₁ / nᵢ；斜看時用相鄰光線交點求出實際像深。</p>';
+function multi(p){const{c,w,h}=lsetup(cv);const k=V('k'),th=V('th')*D2R,mode=V('mode'),show=V('show');const ns=[],ts=[];for(let i=0;i<k;i++){ns.push(V('n'+i));ts.push(V('t'+i));}
+ for(let i=0;i<6;i++){const a=$('n'+i).parentNode,b=$('t'+i).parentNode;a.style.opacity=b.style.opacity=i<k?1:.35;}
+ const top=40,Ttot=ts.reduce((a,b)=>a+b,0)+3;const s=(h-top-12)/Ttot;const yb=[top];ts.forEach(t=>yb.push(yb[yb.length-1]+t*s));const X0=110,xs=v=>X0+v*s;
+ c.fillStyle='#f6f9fa';c.fillRect(0,0,w,h);for(let i=0;i<k;i++){c.fillStyle=`rgba(31,111,120,${0.06+0.14*(ns[i]-1)})`;c.fillRect(0,yb[i],w,yb[i+1]-yb[i]);txt(c,`n${sub[i]} = ${ns[i].toFixed(2)}`,6,yb[i]+14,'#24323a',11);line(c,0,yb[i+1],w,yb[i+1],'#9fb4ba',1);}
+ line(c,0,yb[0],w,yb[0],'#9fb4ba',1);for(let i=1;i<k;i++)txt(c,'('+'ABCDE'[i-1]+')',w-8,yb[i]-3,'#4e6268',11,'right');
+ const inv=ns[0]*Math.sin(th);let tirAt=-1;const ang=[th];for(let i=1;i<k;i++){if(inv>=ns[i]){tirAt=i;break;}ang.push(Math.asin(inv/ns[i]));}
+ let html='',res;
+ if(mode==='tir'){// ray enters from top boundary going down
+  const pts=[];let x=0,y=yb[0];const start=[xs(0)-Math.tan(th)*28,y-28];pts.push(start,[xs(0),y]);const nl=tirAt<0?k:tirAt;for(let i=0;i<nl;i++){x+=ts[i]*s*Math.tan(ang[i]);pts.push([xs(0)+x,yb[i+1]]);}
+  if(tirAt>0){for(let i=tirAt-1;i>=0;i--){x+=ts[i]*s*Math.tan(ang[i]);pts.push([xs(0)+x,yb[i]]);}pts.push([pts[pts.length-1][0]+Math.tan(th)*28,yb[0]-28]);}
+  else{pts.push([pts[pts.length-1][0]+Math.tan(ang[k-1])*20,yb[k]+20]);}
+  const end=partial(c,pts,p,'#d18b14',2.4);line(c,xs(0),yb[0]-30,xs(0),yb[0]+20,'#9fb4ba',1,[3,3]);arcA(c,xs(0),yb[0],22,-Math.PI/2,-Math.PI/2-th,'#7a8a90');tag(c,'θ₁ = '+(th*R2D).toFixed(0)+'°',xs(0)+4,yb[0]+20,'#4e6268');
+  if(tirAt>0&&p>0.4){const q=pts[tirAt+1];c.strokeStyle='#c0304a';c.lineWidth=2;c.beginPath();c.arc(q[0],q[1],7,0,7);c.stroke();tag(c,`在 (${'ABCDE'[tirAt-1]}) 全反射`,q[0]+8,q[1]+20,'#c0304a');}
+  res=tirAt>0?`在 (${'ABCDE'[tirAt-1]}) 全反射`:'一路折射穿出最底層';}
+ else{// depth: object at bottom of stack, observer in layer 1 above, viewing with angle th in layer 1
+  const L=ns.map((n,i)=>({n,t:ts[i]})).reverse();const nOut=ns[0];if(tirAt>0){res='此角度光線無法從底部到達（全反射）';}
+  else{const sinb=inv/ns[k-1],a=Math.asin(sinb);const im=image(L,nOut,a),r=trace(L,nOut,a);const pts=[[xs(0),yb[k]]];let x=0;for(let i=k-1;i>=0;i--){x+=ts[i]*s*Math.tan(ang[i]);pts.push([xs(0)+x,yb[i]]);}pts.push([xs(0)+x+Math.tan(th)*30,yb[0]-30]);
+   partial(c,pts,p,'#1f7f8c',2.4);const le=pts[pts.length-1];eyeIcon(c,le[0],le[1],0.5,1.1);c.fillStyle='#d9a62a';c.beginPath();c.arc(xs(0),yb[k],6,0,7);c.fill();
+   if(im&&p>0.85){const ip=[xs(0)+x-im.y*s*Math.tan(th),yb[0]+im.y*s];partial(c,[pts[k],ip],(p-.85)/.15,'#c0304a',1.5,[6,4]);if(p>=.999){c.strokeStyle='#c0304a';c.beginPath();c.arc(ip[0],ip[1],6,0,7);c.stroke();tag(c,'像',ip[0]+8,ip[1]+4,'#c0304a');}}
+   res=im?`實際像深 ${im.y.toFixed(2)} cm（實深 ${ts.slice(0,k).reduce((a,b)=>a+b,0)} cm）`:'—';}
+  }
+ if(show){html='<table class="layers"><tr><th>界面</th><th>n<sub>上</sub> → n<sub>下</sub></th><th>n₁ sin θ₁ / n<sub>下</sub></th><th>判斷</th></tr>';for(let i=1;i<k;i++){const v=inv/ns[i];const st=tirAt>0&&i>tirAt;html+=`<tr><td>(${'ABCDE'[i-1]})</td><td>${ns[i-1].toFixed(2)} → ${ns[i].toFixed(2)}</td><td>${v.toFixed(3)}</td><td class="${v>=1?'tir':'ok'}">${st?'（光已反射，未到達）':v>=1?'全反射':'折射 '+(Math.asin(v)*R2D).toFixed(1)+'°'}</td></tr>`;}html+='</table>';}
+ let tb=$('mtab');if(!tb){tb=document.createElement('div');tb.id='mtab';$('cards').after(tb);}tb.innerHTML=html;
+ out2('c1',(th*R2D).toFixed(0)+'°');out2('c2',inv.toFixed(3));out2('c3',res);$('c3').style.fontSize='15px';const pd=ns.slice(0,k).reduce((a,n,i)=>a+ts[i]*ns[0]/n,0);out2('c4',pd.toFixed(2)+' cm');}
+const _st=setTab;setTab=function(i){const m=$('mtab');if(m)m.remove();_st(i);};
+initUI(tabs);
+</script></body></html>
