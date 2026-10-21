@@ -111,7 +111,7 @@ function initUI(tabs){UI.tabs=tabs;$('tabs').innerHTML=tabs.map((t,i)=>`<button>
  $('pp').onclick=()=>{UI.play=!UI.play;$('pp').textContent=UI.play?'⏸ 暫停':'▶ 播放';};$('rs').onclick=resetTab;
  window.addEventListener('resize',render);
  const q=new URLSearchParams(location.search);setTab(Math.min(tabs.length-1,+(q.get('tab')||0)));if(q.has('t')){UI.t=+q.get('t');UI.play=false;$('pp').textContent='▶ 播放';render();}
- function loop(ts){const dt=Math.min(0.05,(ts-(UI.last||ts))/1000);UI.last=ts;if(UI.play){UI.t+=dt*UI.speed;if(UI.t>UI.T)UI.t=0;render();}requestAnimationFrame(loop);}requestAnimationFrame(loop);}
+ function loop(ts){requestAnimationFrame(loop);const dt=Math.min(0.05,(ts-(UI.last||ts))/1000);UI.last=ts;if(UI.play){UI.t+=dt*UI.speed;if(UI.t>UI.T)UI.t=0;try{render();}catch(e){}}}requestAnimationFrame(loop);}
 
 const cv=$('cv');const fish=document.createElement('canvas');fish.id='fish';document.querySelector('.stagewrap').appendChild(fish);
 const deg=x=>(x*R2D).toFixed(1)+'°';const o2=(id,s)=>{const e=$(id);if(e)e.textContent=s;};
@@ -203,5 +203,5 @@ const GAL=[
 $('gal').innerHTML=GAL.map((g,i)=>`<div class="gc"><div class="ph"><canvas id="g${i}"></canvas><img src="images/${g.f}.jpg" alt="${g.t}" onerror="this.remove()"><em>照片待使用者提供（images/${g.f}.jpg）</em></div><h4>${g.t}</h4>${g.chips?'<div class="chips">'+g.chips.map(x=>'<span>'+x+'</span>').join('')+'</div>':''}<p>${g.p}</p><p class="cr">${g.cr}</p><button data-i="${i}">套用到模擬</button></div>`).join('');
 GAL.forEach((g,i)=>{fisheye($('g'+i),{n:1.33,d:g.s.d,sun:g.s.sun,X:g.s.X,wave:g.s.wv/100,env:g.s.env},false);});
 document.querySelectorAll('.gc button').forEach(b=>b.onclick=()=>{const g=GAL[+b.dataset.i];setTab(2);for(const k in g.s){$(k).value=g.s[k];}$('med').value='1.33';syncL();render();window.scrollTo({top:0,behavior:'smooth'});});
-const _st=setTab;setTab=function(i){_st(i);fish.style.display=i===2?'block':'none';render();};fish.style.display=UI.tab===2?'block':'none';render();
+const _st=setTab;setTab=function(i){fish.style.display=i===2?'block':'none';_st(i);};fish.style.display=UI.tab===2?'block':'none';render();
 </script></body></html>

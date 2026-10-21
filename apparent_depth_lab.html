@@ -107,7 +107,7 @@ function initUI(tabs){UI.tabs=tabs;$('tabs').innerHTML=tabs.map((t,i)=>`<button>
  $('pp').onclick=()=>{UI.play=!UI.play;$('pp').textContent=UI.play?'⏸ 暫停':'▶ 播放';};$('rs').onclick=resetTab;
  window.addEventListener('resize',render);
  const q=new URLSearchParams(location.search);setTab(Math.min(tabs.length-1,+(q.get('tab')||0)));if(q.has('t')){UI.t=+q.get('t');UI.play=false;$('pp').textContent='▶ 播放';render();}
- function loop(ts){const dt=Math.min(0.05,(ts-(UI.last||ts))/1000);UI.last=ts;if(UI.play){UI.t+=dt*UI.speed;if(UI.t>UI.T)UI.t=0;render();}requestAnimationFrame(loop);}requestAnimationFrame(loop);}
+ function loop(ts){requestAnimationFrame(loop);const dt=Math.min(0.05,(ts-(UI.last||ts))/1000);UI.last=ts;if(UI.play){UI.t+=dt*UI.speed;if(UI.t>UI.T)UI.t=0;try{render();}catch(e){}}}requestAnimationFrame(loop);}
 
 const cv=$('cv');
 // ---------- physics: layers listed from the object outward; exit surface at v=0 ----------
