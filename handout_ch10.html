@@ -1,146 +1,93 @@
 <!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>第十章 幾何光學 §10-1（動畫講義）</title>
 <style>
-body{margin:0;background:#d9d9d9;font-family:"Times New Roman","DFKai-SB","BiauKai","Noto Serif CJK TC","Noto Serif TC","PMingLiU",serif;color:#000}
-.page{background:#fff;width:760px;min-height:1072px;height:auto;margin:18px auto;padding:50px 58px 50px;box-sizing:border-box;box-shadow:0 2px 10px #0003;position:relative;font-size:15.5px;line-height:1.85}
-.hd{text-align:center;font-weight:bold;font-size:17px;border-bottom:1.5px solid #000;padding-bottom:2px;position:relative}
-.hd span{position:absolute;right:0}
-.sec{display:inline-block;font-weight:bold;font-style:italic;border:2px solid #000;border-radius:8px;padding:0 8px;margin:4px 0;box-shadow:2px 2px 0 #000}
-p{margin:0}.i1{padding-left:1.1em}.i2{padding-left:2.2em}.i3{padding-left:3.2em}
-.fig{float:right;clear:right;margin:4px 0 6px 14px;text-align:center}
-.fig canvas{display:block;background:#fff}
-.ctl{font:12px/1.2 sans-serif;color:#555;display:flex;align-items:center;gap:5px;justify-content:center;margin-top:2px}
-.ctl button{font:12px sans-serif;border:1px solid #bbb;background:#f6f6f6;border-radius:4px;padding:1px 6px;cursor:pointer}
-.ctl input[type=range]{width:90px}.ctl select{font-size:11px}
-.ro{font:12px/1.3 sans-serif;color:#2a6b2a}
-.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 3px;line-height:1.25}
-.frac>span:first-child{border-bottom:1px solid #000;padding:0 2px}
-.eq{padding-left:5em;margin:4px 0}
-table.n{border-collapse:collapse;font-size:14px;line-height:1.5;margin:auto}
-table.n td{border:1px solid #000;padding:1px 6px;min-width:56px}table.n td:first-child{text-align:center}
-.tcap{font-weight:bold;font-size:14px;text-align:center}
-.pn{text-align:center;font-size:14px;position:absolute;bottom:14px;left:0;right:0}
-.u{text-decoration:underline;font-weight:bold}.ov{text-decoration:overline}
-.row2{display:flex;gap:18px;justify-content:space-between;align-items:flex-start;margin:6px 0 10px}
-.note{max-width:760px;margin:0 auto 10px;font:13px/1.6 sans-serif;color:#444;text-align:center}
-@media(max-width:780px){.page{width:auto;margin:8px;padding:24px 14px 40px;font-size:15px;min-height:0}.fig{float:none;margin:8px auto}.eq{padding-left:1em}.row2{flex-direction:column;align-items:center}.hd span{position:static;display:block}}
+body{margin:0;background:#d9d9d9;font-family:sans-serif}
+.note{max-width:900px;margin:10px auto 0;font:13px/1.6 sans-serif;color:#444;text-align:center;padding:0 8px}
+.page{position:relative;width:min(900px,calc(100vw - 16px));aspect-ratio:1434/2024;margin:12px auto;background:#fff center/100% 100% no-repeat;box-shadow:0 2px 10px #0003}
+.fb{position:absolute;overflow:hidden}
+.fb canvas{width:100%;height:100%;display:block}
+.bar{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;gap:4px;padding:1px 3px;background:#ffffffd0;font:11px/1.2 sans-serif;color:#2a6b2a;opacity:.12;transition:opacity .2s}
+.fb:hover .bar,.fb:focus-within .bar{opacity:1}
+@media(hover:none) and (pointer:coarse){.bar{opacity:.85}}
+.bar button{font:11px sans-serif;border:1px solid #bbb;background:#f6f6f6;border-radius:3px;padding:0 4px;cursor:pointer}
+.bar input{width:70px;height:12px}.bar select{font-size:10px}.bar span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 </style></head><body>
-<div class="note">原講義：chap10 幾何光學第 10-1、10-2 頁｜圖片改為動畫，可暫停或拖曳滑桿自行調整。<a href="index.html">← 回模擬首頁</a></div>
-
-<div class="page">
-<div class="hd">第十章　幾 何 光 學</div>
-<div class="sec">§10-1 光的折射定律及司乃耳定律</div>
-<div class="fig" id="f1w"><canvas id="f1" width="230" height="250"></canvas>
-<div class="ctl"><button data-p="f1">⏸</button>θ<sub>1</sub><input type="range" id="f1s" min="0" max="85" value="40">
-<select id="f1m"><option value="1.333">第二介質：水</option><option value="1.52" selected>冕玻璃</option><option value="2.419">鑽石</option></select></div>
-<div class="ro" id="f1r"></div></div>
-<p>1.光的折射（refraction）：光從一種介質進入另一種不同的透明介質時，行進方向發生改變的現象。發生原因乃光在不同介質速率改變所致。</p>
-<p>※在兩介質的界面上仍會發生部分反射。</p>
-<p>2.折射定律：</p>
-<p class="i1">(1)入射線、反射線、和法線位在同一平面上，且入射線和反射線位在法線的兩側。</p>
-<p class="i1">(2)入射角和折射角的正弦比值為一定值，即</p>
-<p class="eq"><span class="frac"><span>sin θ<sub>1</sub></span><span>sin θ<sub>2</sub></span></span>＝ <i>n</i>　(<i>n</i><sub>1</sub> sinθ<sub>1</sub> ＝ <i>n</i><sub>2</sub> sinθ<sub>2</sub>)</p>
-<p class="i2">式中 <i>n</i> 為一常數，稱為<span class="u">司乃耳定律</span>。</p>
-<p class="i2">(<i>n</i><sub>1</sub> 、<i>n</i><sub>2</sub> 為介質折射率)</p>
-<div class="fig" style="margin-top:10px"><div class="tcap">一般物質的折射率</div>
-<table class="n"><tr><td>物質</td><td>n</td></tr><tr><td>空氣</td><td>1.000293</td></tr><tr><td>二氧化碳</td><td>1.00045</td></tr><tr><td>水</td><td>1.333</td></tr><tr><td>酒精</td><td>1.361</td></tr><tr><td>甘油</td><td>1.473</td></tr><tr><td>二硫化碳</td><td>1.628</td></tr><tr><td>冰</td><td>1.309</td></tr><tr><td>石英</td><td>1.458</td></tr><tr><td>冕玻璃</td><td>1.52</td></tr><tr><td>食鹽</td><td>1.544</td></tr><tr><td>鉛玻璃</td><td>1.6～1.9</td></tr><tr><td>鑽石</td><td>2.419</td></tr></table></div>
-<p>3.折射率</p>
-<p class="i1">(1)絕對折射率：</p>
-<p class="i2">光從真空中傳播進入某介質時，則上式中的 <i>n</i> 定義為該介質的絕對折射率。</p>
-<p class="i1">※物質的絕對折射率等於光在真空和在該物質中傳播速率的比值( <i>n</i> = <span class="frac"><span><i>c</i></span><span><i>v</i></span></span>)。</p>
-<p class="i1">※不同介質的絕對折射率如右表：</p>
-<p>(2)相對折射率：</p>
-<p class="i2">光從介質 1 進入介質 2，設光在此兩介質中的傳播速率分別為 v<sub>1</sub> 和 v<sub>2</sub>，</p>
-<p class="eq" style="padding-left:2.4em"><span class="frac"><span>sin θ<sub>1</sub></span><span>sin θ<sub>2</sub></span></span>＝<span class="frac"><span>v<sub>1</sub></span><span>v<sub>2</sub></span></span>＝<span class="frac"><span>c / v<sub>2</sub></span><span>c / v<sub>1</sub></span></span>＝<span class="frac"><span><i>n</i><sub>2</sub></span><span><i>n</i><sub>1</sub></span></span>＝ <i>n</i><sub>12</sub></p>
-<p class="i2">式中的 n<sub>12</sub> 稱為介質 2 對介質 1 的相對折射率（relative index of refraction）</p>
-<div class="fig" style="margin-top:6px"><canvas id="f3" width="240" height="200"></canvas>
-<div class="ctl"><button data-p="f3">⏸</button>θ<sub>1</sub><input type="range" id="f3s" min="15" max="70" value="40"></div><div class="ro" id="f3r"></div></div>
-<p class="eq" style="padding-left:2.4em">※　<i>n</i><sub>12</sub> ＝<span class="frac"><span><i>n</i><sub>2</sub></span><span><i>n</i><sub>1</sub></span></span>＝<span class="frac"><span>v<sub>1</sub></span><span>v<sub>2</sub></span></span>＝<span class="frac"><span>λ<sub>1</sub></span><span>λ<sub>2</sub></span></span>（λ 為光波長)</p>
-<p>4.光速與折射率：</p>
-<p class="i1">如右圖：一束光線從真空中以入射角 θ<sub>1</sub> 進入一透明的介質。設光在真空及介質中的速率分</p>
-<div style="clear:both"></div><div class="pn">10-1</div></div>
-
-<div class="page">
-<p>別為 c 和 v（c＞v），圖中 A 和 B 為同一波前上的兩點，若光從 B 至兩介質界面上的 C 點需時 t，則 <span class="ov">BC</span> ＝c t；在同長的時間內，光從 A 點進入介質後，行進至 D 點，得 <span class="ov">AD</span> ＝v t。這時 C 和 D 兩點位在同一波前上，圖中的 θ<sub>2</sub> 為折射角。由圖中可得 <span class="ov">BC</span> ＝ <span class="ov">AC</span> sin θ<sub>1</sub> ， <span class="ov">AD</span> ＝ <span class="ov">AC</span> sin θ<sub>2</sub> ，故</p>
-<p class="eq"><span class="frac"><span>sin θ<sub>1</sub></span><span>sin θ<sub>2</sub></span></span>＝<span class="frac"><span class="ov">BC</span><span class="ov">AD</span></span>＝<span class="frac"><span>ct</span><span>vt</span></span>＝<span class="frac"><span>c</span><span>v</span></span></p>
-<p>，即物質的折射率等於光在真空和在該物質中傳播速率的比值。</p>
-<p class="i1">例：水的折射率為 1.33，則水中的光速為</p>
-<p class="eq" style="padding-left:2em">v ＝ <span class="frac"><span>c</span><span>n</span></span>＝<span class="frac"><span>3×10<sup>8</sup></span><span>1.33</span></span>＝ 2.25 ×10<sup>8</sup>（m/s），約為真空中光速的四分之三。</p>
-<p>※介質中的光速皆小於在真空中的光速。</p>
-<p style="margin-top:14px">5.司乃耳定律的一般性質：</p>
-<p class="i1">(1) 光疏(密)介質：光從一介質進入另一介質時，兩介質的折射率較小者，光在該介質中的速率較大，稱為光疏介質(optically thinner medium)；折射率較大的介質稱為光密介質(optically denser medium)。</p>
-<p class="i1">(2)光從光疏介質進入光密介質時，折射角較入射角小，故折射線偏向法線；光從光密介質進入光疏介質時，折射角較入射角大，故折射線偏離法線。</p>
-<p class="i1">(3)光的折射路徑具有可逆性。</p>
-<div class="row2">
-<div class="fig" style="float:none;margin:0"><canvas id="f4" width="330" height="170"></canvas>
-<div class="ctl"><button data-p="f4">⏸</button>θ<sub>1</sub><input type="range" id="f4s" min="5" max="75" value="35"></div><div class="ro" id="f4r"></div></div>
-<div class="fig" style="float:none;margin:0"><canvas id="f5" width="200" height="190"></canvas>
-<div class="ctl"><button data-p="f5">⏸</button>θ<sub>1</sub><input type="range" id="f5s" min="0" max="80" value="35"></div><div class="ro" id="f5r"></div></div>
+<div class="note">原講義：chap10 幾何光學 第 10-1、10-2 頁｜圖片改為動畫（滑鼠移到圖上可暫停或拖曳 θ₁）。<a href="index.html">← 回模擬首頁</a></div>
+<div class="page" style="background-image:url(ch10_p1.png)">
+ <div class="fb" id="b1"><canvas id="f1"></canvas><div class="bar"><button data-p="f1">⏸</button>θ₁<input type="range" id="f1s" min="0" max="80" step="0.1" value="40"><select id="f1m"><option value="1.333">水</option><option value="1.52" selected>冕玻璃</option><option value="2.419">鑽石</option></select><span id="f1r"></span></div></div>
+ <div class="fb" id="b3"><canvas id="f3"></canvas><div class="bar"><button data-p="f3">⏸</button>θ₁<input type="range" id="f3s" min="25" max="65" step="0.1" value="50"><span id="f3r"></span></div></div>
 </div>
-<p class="i1" style="margin-top:20px">(4)平行介質層的折射及橫向位移：</p>
-<p class="i2">若介質層兩面平行，則入射線和出射線平行，兩者之間有橫向位移。</p>
-<div style="clear:both"></div><div class="pn">10-2</div></div>
-
+<div class="page" style="background-image:url(ch10_p2.png)">
+ <div class="fb" id="b4"><canvas id="f4"></canvas><div class="bar"><button data-p="f4">⏸</button>θ₁<input type="range" id="f4s" min="10" max="70" step="0.1" value="40"><span id="f4r"></span></div></div>
+ <div class="fb" id="b5"><canvas id="f5"></canvas><div class="bar"><button data-p="f5">⏸</button>θ₁<input type="range" id="f5s" min="0" max="75" step="0.1" value="47"><span id="f5r"></span></div></div>
+</div>
 <script>
-const D=Math.PI/180,RED='#d62020',GRN='#1a9b3a',BLUE='#dff3fb';
-const S={f1:{p:1},f3:{p:1},f4:{p:1},f5:{p:1}};
+const PW=1434,PH=2024,D=Math.PI/180,RED='#d40000',DR='#b00000',GRN='#1a9b3a',BLUE='#dff4fb',FONT='"Times New Roman","PMingLiU","Noto Serif CJK TC",serif';
+const BOX={f1:[864,289,1252,789,'b1'],f3:[829,1589,1224,1881,'b3'],f4:[164,1239,809,1547,'b4'],f5:[836,1249,1220,1609,'b5']};
+const S={};for(const k in BOX){S[k]={p:1};const [x0,y0,x1,y1,id]=BOX[k],e=document.getElementById(id);Object.assign(e.style,{left:x0/PW*100+'%',top:y0/PH*100+'%',width:(x1-x0)/PW*100+'%',height:(y1-y0)/PH*100+'%'})}
 document.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{const s=S[b.dataset.p];s.p=!s.p;b.textContent=s.p?'⏸':'▶'});
 document.querySelectorAll('input[type=range]').forEach(r=>r.addEventListener('input',()=>{const k=r.id.slice(0,2);S[k].p=0;document.querySelector('[data-p='+k+']').textContent='▶'}));
-function ctx(id){const c=document.getElementById(id),d=window.devicePixelRatio||1;if(!c._w){c._w=c.width;c._h=c.height;c.style.width=c._w+'px';c.style.height=c._h+'px';c.width=c._w*d;c.height=c._h*d}const g=c.getContext('2d');g.setTransform(d,0,0,d,0,0);g.clearRect(0,0,c._w,c._h);return [g,c._w,c._h]}
-function line(g,x1,y1,x2,y2,col,w,dash){g.save();g.strokeStyle=col;g.lineWidth=w||1.6;g.setLineDash(dash||[]);g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);g.stroke();g.restore()}
-function arrow(g,x1,y1,x2,y2,col,f){const x=x1+(x2-x1)*(f||.5),y=y1+(y2-y1)*(f||.5),a=Math.atan2(y2-y1,x2-x1);g.save();g.fillStyle=col;g.translate(x,y);g.rotate(a);g.beginPath();g.moveTo(6,0);g.lineTo(-5,-4.5);g.lineTo(-5,4.5);g.fill();g.restore()}
-function arc(g,x,y,r,a0,a1,col){if(Math.abs(a1-a0)<.005)return;g.save();g.fillStyle=col+'55';g.strokeStyle=col;g.lineWidth=1.5;g.beginPath();g.moveTo(x,y);g.arc(x,y,r,a0,a1,a1<a0);g.closePath();g.fill();g.stroke();g.restore()}
-function txt(g,s,x,y,col,sz,al){g.save();g.fillStyle=col||'#000';g.font=(sz||13)+'px "DFKai-SB","Noto Serif CJK TC",serif';g.textAlign=al||'left';g.fillText(s,x,y);g.restore()}
-function th(k,t,lo,hi){const s=S[k],r=document.getElementById(k+'s');if(s.p){const v=(lo+hi)/2+(hi-lo)/2*Math.sin(t*0.6);r.value=v.toFixed(1);return v}return +r.value}
+function ctx(k){const c=document.getElementById(k),[x0,y0,x1,y1]=BOX[k],w=x1-x0,h=y1-y0,s=c.clientWidth*(devicePixelRatio||1)/w;const W=Math.max(1,Math.round(w*s)),H=Math.max(1,Math.round(h*s));if(c.width!==W||c.height!==H){c.width=W;c.height=H}const g=c.getContext('2d');g.setTransform(s,0,0,s,0,0);g.fillStyle='#fff';g.fillRect(0,0,w,h);return [g,w,h]}
+function line(g,x1,y1,x2,y2,col,w,dash){g.save();g.strokeStyle=col;g.lineWidth=w||2;g.setLineDash(dash||[]);g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);g.stroke();g.restore()}
+function arrow(g,x1,y1,x2,y2,col,f,sz){sz=sz||10;const x=x1+(x2-x1)*f,y=y1+(y2-y1)*f,a=Math.atan2(y2-y1,x2-x1);g.save();g.fillStyle=col;g.translate(x,y);g.rotate(a);g.beginPath();g.moveTo(sz,0);g.lineTo(-sz,-sz*.55);g.lineTo(-sz,sz*.55);g.fill();g.restore()}
+function arc(g,x,y,r,a0,a1,col,fill){if(Math.abs(a1-a0)<.005)return;g.save();g.strokeStyle=col;g.lineWidth=1.6;if(fill){g.fillStyle=col+'50';g.beginPath();g.moveTo(x,y);g.arc(x,y,r,a0,a1,a1<a0);g.closePath();g.fill()}g.beginPath();g.arc(x,y,r,a0,a1,a1<a0);g.stroke();g.restore()}
+function txt(g,s,x,y,sz,col,it){g.save();g.fillStyle=col||'#222';g.font=(it?'italic ':'')+sz+'px '+FONT;g.fillText(s,x,y);g.restore()}
+function th(k,t,lo,hi){const r=document.getElementById(k+'s');if(S[k].p){const v=(lo+hi)/2+(hi-lo)/2*Math.sin(t*0.6);r.value=v.toFixed(1);return v}return +r.value}
 const snell=(n1,n2,a)=>{const s=n1*Math.sin(a)/n2;return s>1?null:Math.asin(s)};
-// Fig 1
-function f1(t){const [g,W,H]=ctx('f1');const n2=+document.getElementById('f1m').value,a=th('f1',t,10,68)*D,b=snell(1,n2,a);
-const ox=W/2+5,oy=H*.46,L=105;line(g,10,oy,W-5,oy,'#000',1);line(g,ox,18,ox,H-8,'#555',1,[4,3]);
-txt(g,'法線',ox-10,14);txt(g,'N',ox+4,30);txt(g,'第一介質',4,oy-6,'#000',12);txt(g,'第二介質',4,oy+18,'#000',12);txt(g,'O',ox-14,oy+15);
-const ax=ox-L*Math.sin(a),ay=oy-L*Math.cos(a),bx=ox+L*Math.sin(a),cx=ox+L*Math.sin(b),cy=oy+L*Math.cos(b);
-line(g,ax,ay,ox,oy,RED,2);arrow(g,ax,ay,ox,oy,RED,.4);line(g,ox,oy,bx,ay,RED,1.6);arrow(g,ox,oy,bx,ay,RED,.6);line(g,ox,oy,cx,cy,RED,2);arrow(g,ox,oy,cx,cy,RED,.75);
-arc(g,ox,oy,30,-Math.PI/2,-Math.PI/2-a,GRN);arc(g,ox,oy,30,Math.PI/2,Math.PI/2-b,'#1f6fd0');
-txt(g,'A',ax-12,ay+4);txt(g,'B',bx+3,ay+4);txt(g,'C',cx-4,cy+14);txt(g,'入射線',ax+8,ay-2,'#000',12);txt(g,'反射線',bx-44,ay-2,'#000',12);txt(g,'折射線',cx+6,cy-6);
-txt(g,'θ₁',ox-22-6*Math.sin(a/2),oy-34,GRN,14);txt(g,'θ₂',ox+4+8*Math.sin(b/2),oy+46,'#1f6fd0',14);
-document.getElementById('f1r').textContent=`θ₁=${(a/D).toFixed(1)}° → θ₂=${(b/D).toFixed(1)}°｜1.00·sinθ₁ = ${n2}·sinθ₂ = ${Math.sin(a).toFixed(3)}`}
-// Fig 3 Huygens
-function f3(t){const [g,W,H]=ctx('f3');const n=1.33,a=th('f3',t,25,60)*D,b=Math.asin(Math.sin(a)/n);const yI=H*.42,L=115,Ax=40,Cx=Ax+L;
-g.fillStyle=BLUE;g.fillRect(0,yI,W,H-yI);line(g,0,yI,W,yI,'#000',1);txt(g,'真空',W-38,yI-22);txt(g,'光速c',W-42,yI-6);txt(g,'介質',W-38,yI+18);txt(g,'光速v',W-42,yI+34);
-const dx=Math.sin(a),dy=Math.cos(a),BC=L*Math.sin(a),Bx=Cx-BC*dx,By=yI-BC*dy,AD=L*Math.sin(b),Dx=Ax+AD*Math.sin(b),Dy=yI+AD*Math.cos(b);
-const tau=(t*0.35)%1.25>1?1:(t*0.35)%1.25;
-// rays
-[[Ax,yI],[Cx,yI]].forEach(([x,y],i)=>{const s=i?BC:0;line(g,x-(s+60)*dx,y-(s+60)*dy,x,y,RED,1.8);arrow(g,x-(s+60)*dx,y-(s+60)*dy,x,y,RED,.3);line(g,x,y,x+90*Math.sin(b),y+90*Math.cos(b),RED,1.8);arrow(g,x,y,x+90*Math.sin(b),y+90*Math.cos(b),RED,.7)});
-line(g,Ax,yI-50,Ax,yI+60,'#666',1,[3,3]);line(g,Bx,By,Ax,yI,'#333',1.2,[3,2]);line(g,Cx,yI,Dx,Dy,'#333',1.2,[3,2]);
-// moving wavefront
-const Px=Bx+tau*BC*dx,Py=By+tau*BC*dy,Ex=Ax+tau*L,r=tau*AD,Tx=Ax+r*Math.sin(b),Ty=yI+r*Math.cos(b);
-g.save();g.strokeStyle='#1f6fd0';g.globalAlpha=.6;g.setLineDash([2,2]);g.beginPath();g.arc(Ax,yI,Math.max(r,.1),0,Math.PI);g.stroke();g.restore();
-line(g,Px,Py,Ex,yI,'#1f6fd0',2.4);line(g,Ex,yI,Tx,Ty,'#1f6fd0',2.4);
-arc(g,Ax,yI,18,-Math.PI/2,-Math.PI/2-a,GRN);arc(g,Ax,yI,18,Math.PI/2,Math.PI/2-b,GRN);
-txt(g,'A',Ax-14,yI-4);txt(g,'B',Bx+4,By-2);txt(g,'C',Cx+3,yI-4);txt(g,'D',Dx-16,Dy+6);txt(g,'θ₁',Ax-16,yI-20,GRN,12);txt(g,'θ₂',Ax+2,yI+30,GRN,12);txt(g,'ct',(Bx+Cx)/2+4,(By+yI)/2,'#000',12);txt(g,'vt',(Ax+Dx)/2+6,(yI+Dy)/2-2,'#000',12);
-document.getElementById('f3r').textContent=`t=${tau.toFixed(2)}T｜BC=${(BC/L).toFixed(3)}AC, AD=${(AD/L).toFixed(3)}AC｜BC/AD=${(BC/AD).toFixed(2)}=c/v`}
-// Fig 4 two panels
-function f4(t){const [g,W,H]=ctx('f4');const n2=1.33,a=th('f4',t,15,65)*D,b=snell(1,n2,a);g.fillStyle=BLUE;g.fillRect(0,H*.5,W,H*.5);
-[0,1].forEach(k=>{const ox=k*W/2+90,oy=H*.5,L=78;line(g,ox,10,ox,H-5,'#666',1,[3,3]);txt(g,'法線',ox-12,10,'#000',11);
-const ax=ox-L*Math.sin(a),ay=oy-L*Math.cos(a),cx=ox+L*Math.sin(b),cy=oy+L*Math.cos(b);line(g,ax,ay,ox,oy,RED,1.8);line(g,ox,oy,cx,cy,RED,1.8);
-if(!k){arrow(g,ax,ay,ox,oy,RED,.6);arrow(g,ox,oy,cx,cy,RED,.6)}else{arrow(g,cx,cy,ox,oy,RED,.4);arrow(g,ox,oy,ax,ay,RED,.4)}
-const f=(t*0.5)%1;const pos=k?1-f:f;const [px,py]=pos<.5?[ax+(ox-ax)*pos*2,ay+(oy-ay)*pos*2]:[ox+(cx-ox)*(pos-.5)*2,oy+(cy-oy)*(pos-.5)*2];g.fillStyle='#ff9a00';g.beginPath();g.arc(px,py,3.5,0,7);g.fill();
-arc(g,ox,oy,22,-Math.PI/2,-Math.PI/2-a,GRN);arc(g,ox,oy,22,Math.PI/2,Math.PI/2-b,'#1f6fd0');
-txt(g,k?'折射線':'入射線',ax-6,ay-2,'#000',11);txt(g,k?'入射線':'折射線',cx-10,cy+2,'#000',11);txt(g,'第一介質 n₁',k*W/2+4,oy-4,'#000',11);txt(g,'第二介質 n₂',k*W/2+4,oy+14,'#000',11);txt(g,'O',ox-12,oy+12,'#000',11);
-txt(g,'θ₁',ox+3,oy-24,GRN,11);txt(g,'θ₂',ox+2,oy+36,'#1f6fd0',11)});
-document.getElementById('f4r').textContent=`n₁=1.00, n₂=1.33：θ₁=${(a/D).toFixed(1)}° ↔ θ₂=${(b/D).toFixed(1)}°（左：疏→密，右：路徑反向，角度不變）`}
-// Fig 5 slab
-function f5(t){const [g,W,H]=ctx('f5');const n2=1.5,a=th('f5',t,5,70)*D,b=snell(1,n2,a);const y1=60,y2=125,x0=40,ox=90;
-g.fillStyle='#fff';g.strokeStyle='#000';g.lineWidth=1.2;g.strokeRect(10,y1,W-20,y2-y1);txt(g,'介質',30,y1+28,'#000',14);txt(g,'n₂',30,y1+48,'#000',13);txt(g,'介質 n₁',8,y1-22,'#555',12);
-line(g,ox,8,ox,y1+20,'#555',1,[3,3]);const L=60,ax=ox-L*Math.sin(a),ay=y1-L*Math.cos(a);const ex=ox+(y2-y1)*Math.tan(b);
-line(g,ex,y2-18,ex,H-5,'#555',1,[3,3]);line(g,ax,ay,ox,y1,'#000',1.6);arrow(g,ax,ay,ox,y1,'#000',.6);line(g,ox,y1,ex,y2,'#000',1.6);
-const L2=60,fx=ex+L2*Math.sin(a),fy=y2+L2*Math.cos(a);line(g,ex,y2,fx,fy,'#000',1.6);arrow(g,ex,y2,fx,fy,'#000',.7);
-const gx=ox+(y2-y1+L2*Math.cos(a))*Math.tan(a);line(g,ox,y1,gx,fy,'#777',1,[4,3]);
-// lateral shift
-const d=(y2-y1)*Math.sin(a-b)/Math.cos(b);if(d>1){const ux=Math.sin(a),uy=Math.cos(a),wx=ex-ox,wy=y2-y1,k=wx*ux+wy*uy;line(g,ex,y2,ox+k*ux,y1+k*uy,'#e07000',2.2);txt(g,'d',(ex+ox+k*ux)/2+4,(y2+y1+k*uy)/2+4,'#e07000',12)}
-arc(g,ox,y1,16,-Math.PI/2,-Math.PI/2-a,GRN);arc(g,ox,y1,18,Math.PI/2,Math.PI/2-b,'#1f6fd0');arc(g,ex,y2,16,Math.PI/2,Math.PI/2-a,GRN);
-txt(g,'入射線',4,14,'#000',12);txt(g,'法線',ox+4,16,'#000',12);txt(g,'θ₁',ox+2,y1-18,GRN,12);txt(g,'θ₂',ox+4,y1+30,'#1f6fd0',12);txt(g,'θ₁',ex+3,y2+30,GRN,12);txt(g,'出射線',W-48,H-6,'#000',12);
-document.getElementById('f5r').textContent=`n₂=1.5，厚 t：θ₂=${(b/D).toFixed(1)}°，出射角=${(a/D).toFixed(1)}°，橫向位移 d=${(Math.sin(a-b)/Math.cos(b)).toFixed(2)} t`}
-// lateral shift segment correction: perpendicular from exit point to dashed incident extension
+const up=-Math.PI/2,dn=Math.PI/2;
+// Fig1: original geometry, O=(194,263), θ1≈40°
+function f1(t){const [g]=ctx('f1'),n2=+document.getElementById('f1m').value,a=th('f1',t,22,58)*D,b=snell(1,n2,a),ox=194,oy=263,L=Math.min(288,178/Math.sin(a),220/Math.cos(a));
+line(g,4,oy,386,oy,'#222',2);line(g,ox,40,ox,475,'#888',1.6,[6,5]);
+txt(g,'法線',170,30,26,'#666');txt(g,'N',203,52,26);txt(g,'第一介質',12,232,26);txt(g,'第二介質',12,322,26);txt(g,'O',166,296,26);txt(g,'入射點',222,246,26);
+const ax=ox-L*Math.sin(a),ay=oy-L*Math.cos(a),bx=ox+L*Math.sin(a),cx=ox+250*Math.sin(b)/Math.cos(b)*Math.cos(b),cy=oy+250*Math.cos(b);
+line(g,ax,ay,ox,oy,RED,2.6);arrow(g,ax,ay,ox,oy,RED,.18);line(g,ox,oy,bx,ay,RED,2.6);arrow(g,ox,oy,bx,ay,RED,.88);line(g,ox,oy,cx,cy,RED,2.6);arrow(g,ox,oy,cx,cy,RED,.68);
+arc(g,ox,oy,52,up,up-a,GRN,1);arc(g,ox,oy,52,dn,dn-b,'#1f6fd0',1);
+txt(g,'θ',ox-34-30*Math.sin(a/2),oy-62,26,GRN,1);txt(g,'1',ox-20-30*Math.sin(a/2),oy-56,15,GRN);
+txt(g,'θ',ox+8+20*Math.sin(b/2),oy+80,26,'#1f6fd0',1);txt(g,'2',ox+22+20*Math.sin(b/2),oy+86,15,'#1f6fd0');
+const ux=Math.sin(a),uy=Math.cos(a);txt(g,'A',ax+6-28,ay+28,26);txt(g,'入射線',ax+ux*40+14,ay+uy*40-6,26);txt(g,'B',bx-6,ay+30,26);txt(g,'反射線',bx-ux*40-110,ay+uy*40-6,26);
+const cxl=ox+0.82*(cx-ox),cyl=oy+0.82*(cy-oy);txt(g,'折射線',cxl+14,cyl+6,26);txt(g,'C',cxl-24,cyl+38,26);
+document.getElementById('f1r').textContent=`θ₁=${(a/D).toFixed(1)}° θ₂=${(b/D).toFixed(1)}° sinθ₁/sinθ₂=${n2}`}
+// Fig3: Huygens, interface y=130, A=146, C=298
+function f3(t){const [g,W,H]=ctx('f3'),n=1.33,a=th('f3',t,35,62)*D,b=Math.asin(Math.sin(a)/n),yI=130,Ax=146;
+g.fillStyle=BLUE;g.fillRect(86,yI,W-86,H-yI);line(g,86,yI,W,yI,'#999',1);
+const AC=152,Cx=Ax+AC,dx=Math.sin(a),dy=Math.cos(a),BC=AC*Math.sin(a),Bx=Cx-BC*dx,By=yI-BC*dy,AD=AC*Math.sin(b),Dx=Ax+AD*Math.sin(b),Dy=yI+AD*Math.cos(b);
+const k=(t*0.35)%1.3,tau=Math.min(1,k);
+[[Ax,0],[Cx,BC]].forEach(([x,s])=>{const L0=s+130,sx=x-L0*dx,sy=yI-L0*dy;line(g,sx,sy,x,yI,DR,3);arrow(g,sx,sy,x,yI,DR,s?.3:.45,9);const ex=x+(H-yI)*Math.tan(b);line(g,x,yI,ex,H,DR,3);arrow(g,x,yI,ex,H,DR,.75,9)});
+line(g,Ax,yI-110,Ax,H,'#888',1.4,[3,3]);line(g,Bx,By,Ax,yI,'#335',1.4,[4,3]);line(g,Cx,yI,Dx,Dy,'#335',1.4,[4,3]);
+const Px=Bx+tau*BC*dx,Py=By+tau*BC*dy,Ex=Ax+tau*AC,r=tau*AD,Tx=Ax+r*Math.sin(b),Ty=yI+r*Math.cos(b);
+g.save();g.strokeStyle='#1f6fd0';g.globalAlpha=.5;g.setLineDash([3,3]);g.beginPath();g.arc(Ax,yI,Math.max(r,.1),0,Math.PI);g.stroke();g.restore();
+line(g,Px,Py,Ex,yI,'#1f6fd0',3);line(g,Ex,yI,Tx,Ty,'#1f6fd0',3);
+arc(g,Ax,yI,26,up,up-a,GRN,1);arc(g,Ax,yI,26,dn,dn-b,GRN,1);
+txt(g,'θ',Ax-30,yI-30,20,'#222',1);txt(g,'1',Ax-19,yI-26,12);txt(g,'θ',Ax+2,yI+42,20,'#222',1);txt(g,'2',Ax+13,yI+46,12);
+txt(g,'A',Ax-18,yI+16,20);txt(g,'B',Bx+6,By-2,20);txt(g,'C',Cx+6,yI-6,20);txt(g,'D',Dx-20,Dy+12,20);
+txt(g,'ct',(Bx+Cx)/2+10,(By+yI)/2,20,'#222',1);txt(g,'vt',(Ax+Dx)/2+8,(yI+Dy)/2-4,20,'#222',1);
+txt(g,'真空',318,70,22);txt(g,'光速',318,96,22);txt(g,'c',366,96,22,'#222',1);txt(g,'介質',318,166,22);txt(g,'光速',318,192,22);txt(g,'v',366,192,22,'#222',1);
+document.getElementById('f3r').textContent=`θ₂=${(b/D).toFixed(1)}° BC/AD=${(BC/AD).toFixed(2)}=c/v`}
+// Fig4: two panels, interface y=156, normals x=159/459
+function f4(t){const [g,W,H]=ctx('f4'),a=th('f4',t,20,62)*D,b=snell(1,1.5,a),oy=156;g.fillStyle=BLUE;g.fillRect(4,oy,612,H-oy);line(g,4,oy,616,oy,'#999',1);
+[0,1].forEach(k=>{const ox=159+300*k;line(g,ox,10,ox,H,'#999',1.2,[4,3]);txt(g,'法線',ox-18,26,19);
+const L=150,ax=ox-L*Math.sin(a),ay=oy-L*Math.cos(a),cx=ox+(H-oy)*Math.tan(b),cy=H;line(g,ax,ay,ox,oy,DR,2.4);line(g,ox,oy,cx,cy,DR,2.4);
+if(!k){arrow(g,ax,ay,ox,oy,DR,.7,8);arrow(g,ox,oy,cx,cy,DR,.6,8)}else{arrow(g,cx,cy,ox,oy,DR,.4,8);arrow(g,ox,oy,ax,ay,DR,.3,8)}
+const f=(t*0.45)%1,pos=k?1-f:f,[px,py]=pos<.5?[ax+(ox-ax)*pos*2,ay+(oy-ay)*pos*2]:[ox+(cx-ox)*(pos-.5)*2,oy+(cy-oy)*(pos-.5)*2];g.fillStyle='#ff9a00';g.beginPath();g.arc(px,py,5,0,7);g.fill();
+arc(g,ox,oy,34,up,up-a,GRN,1);arc(g,ox,oy,34,dn,dn-b,'#1f6fd0',1);
+txt(g,'θ',ox+4,oy-38,19,'#222',1);txt(g,'1',ox+14,oy-35,11);txt(g,'θ',ox+6,oy+52,19,'#222',1);txt(g,'2',ox+16,oy+55,11);
+txt(g,k?'折射線':'入射線',ax-44,ay-8,19);txt(g,k?'入射線':'折射線',cx+12,H-40,19);
+const X=300*k;txt(g,'第一介質',X+8,94,19);txt(g,'n',X+32,118,16,'#222',1);txt(g,'1',X+41,122,10);txt(g,'第二介質',X+8,180,19);txt(g,'n',X+32,204,16,'#222',1);txt(g,'2',X+41,208,10);txt(g,'O',ox-16,oy+20,19)});
+document.getElementById('f4r').textContent=`n₁=1.0 n₂=1.5 θ₂=${(b/D).toFixed(1)}° 反向角度不變`}
+// Fig5: slab (45,118)-(368,239), entry x=193
+function f5(t){const [g,W,H]=ctx('f5'),n2=1.6,a=th('f5',t,15,62)*D,b=snell(1,n2,a),y1=118,y2=239,ox=193;
+g.strokeStyle='#222';g.lineWidth=2;g.strokeRect(45,y1,323,y2-y1);
+const ex=ox+(y2-y1)*Math.tan(b);line(g,ox,48,ox,y2+20,'#444',1.4,[4,3]);line(g,ex,y1+10,ex,H-30,'#444',1.4,[4,3]);
+const L=135,ax=ox-L*Math.sin(a),ay=y1-L*Math.cos(a);line(g,ax,ay,ox,y1,'#111',2.4);arrow(g,ax,ay,ox,y1,'#111',.35,8);
+line(g,ox,y1,ex,y2,'#111',2.4);arrow(g,ox,y1,ex,y2,'#111',.6,8);
+const L2=110,fx=ex+L2*Math.sin(a),fy=y2+L2*Math.cos(a);line(g,ex,y2,fx,fy,'#111',2.4);arrow(g,ex,y2,fx,fy,'#111',.7,8);
+const gL=(H-y1)/Math.cos(a)*0.95;line(g,ox,y1,ox+gL*Math.sin(a),y1+gL*Math.cos(a),'#444',1.4,[5,4]);
+const ux=Math.sin(a),uy=Math.cos(a),k=(ex-ox)*ux+(y2-y1)*uy;if(a>.05){line(g,ex,y2,ox+k*ux,y1+k*uy,'#e07000',2.6);txt(g,'d',(ex+ox+k*ux)/2+6,(y2+y1+k*uy)/2+2,18,'#e07000',1)}
+arc(g,ox,y1,34,up,up-a,GRN,1);arc(g,ox,y1,38,dn,dn-b,'#1f6fd0',1);arc(g,ex,y2,34,dn,dn-a,GRN,1);
+txt(g,'入射線',4,32,26);txt(g,'法線',170,32,26);txt(g,'介質',56,66,26);txt(g,'n',58,104,20,'#222',1);txt(g,'1',69,108,12);
+txt(g,'θ',ox+6,y1-28,24,'#222',1);txt(g,'1',ox+18,y1-24,12);txt(g,'介質',96,160,26);txt(g,'n',98,196,22,'#222',1);txt(g,'2',110,200,12);
+txt(g,'θ',ox+8,y1+66,24,'#222',1);txt(g,'2',ox+20,y1+70,12);txt(g,'θ',ex+6,y2+64,24,'#222',1);txt(g,'1',ex+18,y2+68,12);txt(g,'出射線',296,352,24);
+document.getElementById('f5r').textContent=`n₂=1.6 θ₂=${(b/D).toFixed(1)}° d=${(Math.sin(a-b)/Math.cos(b)).toFixed(2)}t`}
 function loop(ms){const t=ms/1000;for(const f of [f1,f3,f4,f5]){try{f(t)}catch(e){document.body.dataset.err=e.message}}requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
 </script></body></html>
