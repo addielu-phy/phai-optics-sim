@@ -173,18 +173,38 @@ function single(p){const{c,w,h}=lsetup(cv);const n=+V('med'),th=V('th')*D2R,tc=M
  line(c,ox,sy,ox-L*Math.sin(tc),sy+L*Math.cos(tc),'rgba(122,91,200,.6)',1,[5,4]);txt(c,'臨界角',ox-L*Math.sin(tc)-10,sy+L*Math.cos(tc),'#5a3fb0',12,'right');
  o2('c1',deg(tc));o2('c2',th<tc?deg(Math.asin(n*Math.sin(th))):'不存在');o2('c3',(R*100).toFixed(1)+'%');o2('c4',th<tc?'折射＋部分反射':'全反射');}
 // ---------- fan ----------
-function fan(p){const{c,w,h}=lsetup(cv);const n=+V('med'),d=V('fd'),step=V('fs'),tc=Math.asin(1/n);const sy=h*0.32,s=(h-sy-30)/Math.max(d,1),ox=w/2,src=[ox,sy+d*s];
+function obsSolve(n,d,X,H){const tc=Math.asin(1/n);const g=a=>d*Math.tan(a)+H*Math.tan(Math.asin(n*Math.sin(a)));let lo=0,hi=tc-1e-9;for(let k=0;k<100;k++){const m=(lo+hi)/2;g(m)>X?hi=m:lo=m;}const a=lo,o=Math.asin(n*Math.sin(a)),e=1e-7;
+ const q=b=>[d*Math.tan(b),Math.tan(Math.asin(n*Math.sin(b)))];const A=q(a-e),B=q(a+e);const y=a<1e-5?d/n:(B[0]-A[0])/(B[1]-A[1]);const u=d*Math.tan(a);return{a,o,u,y,xi:u-y*Math.tan(o)};}
+function fan(p){fish.style.display=$('obs').checked?'block':'none';const{c,w,h}=lsetup(cv);const n=+V('med'),d=V('fd'),step=V('fs'),tc=Math.asin(1/n),show=V('obs'),X=V('ox'),H=V('oh');
+ const r=d*Math.tan(tc);const xr=show?Math.max(X,r)+0.8:r+1.2,xl=show?-(r+0.8):-(r+1.2);const top=show?H+0.4:1.2;
+ const s=Math.min((w-30)/(xr-xl),(h-30)/(top+d+0.3)),ox=15+(-xl)*s+((w-30)-(xr-xl)*s)/2,sy=15+top*s,src=[ox,sy+d*s];const M=(x,y)=>[ox+x*s,sy-y*s];
  c.fillStyle='#eef5f9';c.fillRect(0,0,w,sy);c.fillStyle='#bfe0e6';c.fillRect(0,sy,w,h-sy);line(c,0,sy,w,sy,'#6b8f99',1.5);
- let out=0,tot=0;for(let a=-85;a<=85.01;a+=step){tot++;const t=a*D2R,hit=[ox+d*s*Math.tan(t),sy];const ok=Math.abs(t)<tc;if(ok)out++;
-  const pts=[src,hit];if(ok){const t2=Math.asin(n*Math.sin(t));pts.push([hit[0]+Math.sin(t2)*sy,hit[1]-Math.cos(t2)*sy]);}else{pts.push([hit[0]+Math.tan(t)*d*s,src[1]]);}
-  partial(c,pts,p,ok?'#d8a62a':'#c0304a',1.6);}
- const r=d*Math.tan(tc);line(c,ox-r*s,sy+3,ox+r*s,sy+3,'#1f8a94',5);txt(c,'透光圓（直徑 2d·tanθc）',ox,sy-8,'#1f6f78',13,'center');c.fillStyle='#fff3b0';c.beginPath();c.arc(src[0],src[1],7,0,7);c.fill();c.strokeStyle='#b07a00';c.stroke();
- o2('c1',deg(tc));o2('c2',(2*r).toFixed(2)+' m');o2('c3',`${out} / ${tot} 條`);o2('c4',`${(100*(1-Math.cos(tc))).toFixed(0)}%`);}
+ let out=0,tot=0;c.save();if(show)c.globalAlpha=.45;for(let a=-85;a<=85.01;a+=step){tot++;const t=a*D2R,hit=[ox+d*s*Math.tan(t),sy];const ok=Math.abs(t)<tc;if(ok)out++;
+  const pts=[src,hit];if(ok){const t2=Math.asin(n*Math.sin(t));pts.push([hit[0]+Math.sin(t2)*sy*2,hit[1]-Math.cos(t2)*sy*2]);}else{pts.push([hit[0]+Math.tan(t)*d*s,src[1]]);}
+  partial(c,pts,p,ok?'#d8a62a':'#c0304a',1.6);}c.restore();
+ line(c,ox-r*s,sy+3,ox+r*s,sy+3,'#1f8a94',5);txt(c,'亮圓（半徑 d·tanθc）',ox,sy+20,'#1f6f78',13,'center');c.fillStyle='#fff3b0';c.beginPath();c.arc(src[0],src[1],7,0,7);c.fill();c.strokeStyle='#b07a00';c.stroke();
+ o2('c1',deg(tc));o2('c2',(2*r).toFixed(2)+' m');o2('c3',`${out} / ${tot} 條`);o2('c4',`${(100*(1-Math.cos(tc))).toFixed(0)}%`);
+ if(!show){['c5','c6','c7'].forEach(k=>o2(k,'（開啟觀察者）'));return;}
+ const S=obsSolve(n,d,X,H),E=M(X,H),ex=M(S.u,0),im=M(S.xi,-S.y);
+ partial(c,[src,ex,E],p,'#1a9c5a',3.2);if(p>0.8){partial(c,[ex,im],(p-0.8)/0.2,'#1a9c5a',1.6,[6,4]);if(p>=.999){c.fillStyle='rgba(255,235,120,.9)';c.strokeStyle='#1a9c5a';c.beginPath();c.arc(im[0],im[1],6,0,7);c.fill();c.stroke();tag(c,'光源的像',im[0]+9,im[1]+4,'#1a7a46');}}
+ eyeIcon(c,E[0],E[1],Math.PI-0.6,1.2);tag(c,'水面上觀察者',E[0]-40,E[1]-14,'#1a7a46');
+ o2('c5',(r).toFixed(2)+' m');o2('c6',`${S.y.toFixed(2)} m（正上方 d/n = ${(d/n).toFixed(2)} m）`);o2('c7',`看得到：視線與鉛直 ${deg(S.o)}，水中 ${deg(S.a)} < θc`);
+ obsView(fish,n,d,X,H,S,r);}
+function obsView(cnv,n,d,X,H,S,r){const{c,w,h}=lsetup(cnv);const E=[X,H,0],T=[S.xi,-S.y,0];const sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]],dt=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2],nm=a=>{const l=Math.hypot(...a);return a.map(x=>x/l);},cr=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+ const f=nm(sub(T,E)),rt=nm(cr(f,[0,1,0])),up=cr(rt,f),F=w*0.75,cx=w/2,cy=h*0.6;const P=q=>{const v=sub(q,E),z=dt(v,f);if(z<=1e-3)return null;return[cx+F*dt(v,rt)/z,cy-F*dt(v,up)/z];};
+ let g=c.createLinearGradient(0,0,0,h);g.addColorStop(0,'#9ccbf0');g.addColorStop(1,'#e6f3fb');c.fillStyle=g;c.fillRect(0,0,w,h);
+ const hz=P([X-1e4,0,0]);const hy=hz?hz[1]:0;g=c.createLinearGradient(0,hy,0,h);g.addColorStop(0,'#c9dbe6');g.addColorStop(1,'#3d6f86');c.fillStyle=g;c.fillRect(0,hy,w,h-hy);
+ txt(c,'水面：圓外只見天空反射（水下光全反射出不來）',8,Math.min(h-8,hy+18),'#fff',11);
+ c.save();c.beginPath();let st=false;for(let i=0;i<=120;i++){const t=i/120*2*Math.PI,q=P([r*Math.cos(t),0,r*Math.sin(t)]);if(!q)continue;st?c.lineTo(...q):c.moveTo(...q);st=true;}c.closePath();
+ const ip=P(T);g=c.createRadialGradient(ip[0],ip[1],2,ip[0],ip[1],w*0.4);g.addColorStop(0,'rgba(255,250,200,.95)');g.addColorStop(1,'rgba(255,230,140,.45)');c.fillStyle=g;c.fill();c.strokeStyle='#d8a62a';c.lineWidth=1.5;c.stroke();c.restore();
+ const sg=c.createRadialGradient(ip[0],ip[1],0,ip[0],ip[1],16);sg.addColorStop(0,'#fff');sg.addColorStop(.4,'#ffe27a');sg.addColorStop(1,'rgba(255,226,122,0)');c.fillStyle=sg;c.beginPath();c.arc(ip[0],ip[1],16,0,7);c.fill();
+ const rp=P([0,-d,0]);if(rp){c.setLineDash([3,3]);c.strokeStyle='#c0304a';c.beginPath();c.arc(rp[0],rp[1],7,0,7);c.stroke();c.setLineDash([]);tag(c,'實際位置（若無折射）',rp[0]+10,rp[1]+14,'#c0304a');}
+ tag(c,'看到的光源（像）',ip[0]+12,ip[1]-10,'#1a7a46');txt(c,'水面上觀察者看到的畫面',8,16,'#24323a',13,true);}
 const tabs=[
 {name:'單一光線',ctrls:[{id:'med',label:'光源所在介質（上方為空氣）',sel:MED,v:'1.33'},{id:'th',label:'入射角 θ₁',min:0,max:89,step:0.5,v:40,u:'°'}],cards:[['c1','臨界角 θc'],['c2','折射角 θ₂'],['c3','反射率 R（菲涅耳，非偏振）'],['c4','結果']],
  note:'<p>光從水射向空氣，入射角越大，反射越強；到臨界角 θc = sin⁻¹(1/n) 時折射角變成 90°，再大就只剩反射。線條粗細透明度代表菲涅耳強度：其實在臨界角之前反射率就已經急遽上升，並不是「突然」變成全反射。</p>',draw:single},
-{name:'水下光扇',ctrls:[{id:'med',label:'光源所在介質（上方為空氣）',sel:MED,v:'1.33'},{id:'fd',label:'光源深度 d',min:0.5,max:5,step:0.1,v:2,u:' m'},{id:'fs',label:'光線間隔',min:2,max:10,step:1,v:5,u:'°'}],cards:[['c1','臨界角 θc'],['c2','透光圓直徑 2d·tanθc'],['c3','跑出水面的光線'],['c4','逃出水面的立體角比例（上半球）']],
- note:'<p>水下點光源只有在 θc 以內的光能穿出水面，在水面形成一個透光圓；反過來想（光路可逆），水下的眼睛也只能透過這個圓看到水面上的世界——這就是斯涅爾窗。注意：透光圓不是「透光面積」，它的大小只跟深度和臨界角有關；圓外的水面也有光照到，只是全反射回水中。</p>',draw:fan},
+{name:'水下光扇',ctrls:[{id:'med',label:'光源所在介質（上方為空氣）',sel:MED,v:'1.33'},{id:'fd',label:'光源深度 d',min:0.5,max:5,step:0.1,v:2,u:' m'},{id:'fs',label:'光線間隔',min:2,max:10,step:1,v:5,u:'°'},{id:'obs',chk:1,label:'顯示水面上觀察者',v:1},{id:'ox',label:'觀察者水平距離',min:0,max:6,step:0.1,v:4,u:' m'},{id:'oh',label:'觀察者眼睛高度',min:0.3,max:3,step:0.1,v:1.5,u:' m'}],cards:[['c1','臨界角 θc'],['c2','透光圓直徑 2d·tanθc'],['c3','跑出水面的光線'],['c4','逃出水面的立體角比例（上半球）'],['c5','亮圓半徑 d·tanθc'],['c6','觀察者看到光源的視深'],['c7','是否看得到光源']],
+ note:'<p>水下點光源只有在 θc 以內的光能穿出水面，在水面形成一個透光圓；反過來想（光路可逆），水下的眼睛也只能透過這個圓看到水面上的世界——這就是斯涅爾窗。注意：透光圓不是「透光面積」，它的大小只跟深度和臨界角有關；圓外的水面也有光照到，只是全反射回水中。</p><p>水面上的觀察者：從光源出發、在 θc 以內射出的光才可能進入眼睛，所以從岸上看，水面上只有半徑 d·tanθc 的亮圓會發光，圓外只看到天空的反射。眼睛沿射入方向反推，看到的光源比實際淺、而且往觀察者靠近（斜看視深小於 d/n）；只要眼睛在水面上方，總有一條 θ &lt; θc 的光能到達，所以一定看得到光源。</p>',draw:fan},
 {name:'斯涅爾窗（水下仰望）',ctrls:[{id:'med',label:'光源所在介質（上方為空氣）',sel:MED,v:'1.33'},{id:'d',label:'眼睛深度 d',min:0.5,max:8,step:0.1,v:3,u:' m'},{id:'sun',label:'太陽仰角',min:2,max:90,step:1,v:55,u:'°'},{id:'X',label:'浮球水平距離',min:0.5,max:8,step:0.1,v:3.2,u:' m'},{id:'wv',label:'水面波動',min:0,max:60,step:5,v:20,u:'%'},{id:'env',label:'水下環境',sel:ENV,v:'pool'}],
  cards:[['c1','臨界角 θc'],['c2','窗的視角 2θc'],['c3','窗的直徑 2r = 2d·tanθc'],['c4','太陽影像偏離正上方'],['c5','浮球倒影的視線角']],
  note:'<p>水面上 180° 的天空經折射被壓縮進 2θc ≈ 97.5° 的圓錐，所以窗緣就是地平線，太陽仰角越低越靠近窗緣（但永遠不會出窗）。窗的「視角」與深度無關，但窗在水面上的直徑 2d·tanθc 隨深度變大。窗外看到的是水面全反射的池底與池中物體——浮球的倒影視線角若小於 θc，只有部分反射（R 只有幾 %，倒影很淡）；超過 θc 就是 100% 的清晰倒影。</p><p>浮球設定為球心在水面下 0.8 m；倒影視線角 = tan⁻¹(x / (d + 0.8))。水面波動會讓窗緣抖動、太陽影像拉長成光斑。</p>',draw:sideWindow}];
@@ -203,5 +223,5 @@ const GAL=[
 $('gal').innerHTML=GAL.map((g,i)=>`<div class="gc"><div class="ph"><canvas id="g${i}"></canvas><img src="images/${g.f}.jpg" alt="${g.t}" onerror="this.remove()"><em>照片待使用者提供（images/${g.f}.jpg）</em></div><h4>${g.t}</h4>${g.chips?'<div class="chips">'+g.chips.map(x=>'<span>'+x+'</span>').join('')+'</div>':''}<p>${g.p}</p><p class="cr">${g.cr}</p><button data-i="${i}">套用到模擬</button></div>`).join('');
 GAL.forEach((g,i)=>{fisheye($('g'+i),{n:1.33,d:g.s.d,sun:g.s.sun,X:g.s.X,wave:g.s.wv/100,env:g.s.env},false);});
 document.querySelectorAll('.gc button').forEach(b=>b.onclick=()=>{const g=GAL[+b.dataset.i];setTab(2);for(const k in g.s){$(k).value=g.s[k];}$('med').value='1.33';syncL();render();window.scrollTo({top:0,behavior:'smooth'});});
-const _st=setTab;setTab=function(i){fish.style.display=i===2?'block':'none';_st(i);};fish.style.display=UI.tab===2?'block':'none';render();
+const _st=setTab;setTab=function(i){fish.style.display=i===0?'none':'block';_st(i);};fish.style.display=UI.tab===0?'none':'block';render();
 </script></body></html>
